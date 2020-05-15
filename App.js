@@ -28,25 +28,31 @@ class NumPicker extends React.Component {
 function PickerCardGroup() {
     return (
         <View>
-            <Text h4 style={styles.pickerTitle}>目標</Text>
-            <View style={styles.pickerContainer}>
-                <NumPicker selected={0} max={50}/>
-                <Text>回</Text>
-                <NumPicker selected={1} max={10}/>
-                <Text>セット</Text>
+            <View style={styles.pickerCard}>
+                <Text style={styles.pickerTitle}>目標</Text>
+                <View style={styles.pickerContainer}>
+                    <NumPicker selected={0} max={50}/>
+                    <Text>回</Text>
+                    <NumPicker selected={1} max={10}/>
+                    <Text>セット</Text>
+                </View>
             </View>
-            <Text h4 style={styles.pickerTitle}>インターバル</Text>
-            <View style={styles.pickerContainer}>
-                <NumPicker selected={0} max={9}/>
-                <Text>分</Text>
-                <NumPicker selected={0} max={59}/>
-                <Text>秒</Text>
+            <View style={styles.pickerCard}>
+                <Text style={styles.pickerTitle}>インターバル</Text>
+                <View style={styles.pickerContainer}>
+                    <NumPicker selected={0} max={9}/>
+                    <Text>分</Text>
+                    <NumPicker selected={0} max={59}/>
+                    <Text>秒</Text>
+                </View>
             </View>
-            <Text h4 style={styles.pickerTitle}>間隔(ピッチ)</Text>
-            <View style={styles.pickerContainer}>
-                <Text>1回に</Text>
-                <NumPicker selected={1} max={10}/>
-                <Text>秒かける</Text>
+            <View style={styles.pickerCard}>
+                <Text style={styles.pickerTitle}>間隔(ピッチ)</Text>
+                <View style={styles.pickerContainer}>
+                    <Text>1回に</Text>
+                    <NumPicker selected={1} max={10}/>
+                    <Text>秒かける</Text>
+                </View>
             </View>
         </View>
     );
@@ -104,7 +110,7 @@ function TotalSetTime(props) {
     );
 }
 
-function SetDisplayBar() {
+function SetDisplayGroup() {
     return (
         <Text h1>
             <NowSetTime now={2}/>
@@ -213,7 +219,7 @@ function CircleDisplayGroup() {
 
 function SettingWindow() {
     return (
-        <ScrollView style={styles.mainContainer}>
+        <ScrollView style={styles.settingWindowContainer}>
             <PickerCardGroup/>
         </ScrollView>
     );
@@ -221,10 +227,10 @@ function SettingWindow() {
 
 function CounterWindow() {
     return (
-        <ScrollView style={styles.mainContainer}>
-            <SetDisplayBar/>
+        <View>
+            <SetDisplayGroup/>
             <CircleDisplayGroup/>
-        </ScrollView>
+        </View>
     );
 }
 
@@ -243,8 +249,6 @@ export default function App() {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff'
-    },
-    mainContainer: {
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -268,10 +272,27 @@ const styles = StyleSheet.create({
         height: 200
     },
     pickerTitle: {
-        textAlign: 'center'
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 25,
     },
     pickerItem: {
         height: 200,
         width: 100
     },
+    settingWindowContainer: {
+        backgroundColor: '#F1F0F2',
+        paddingLeft: '5%',
+        paddingRight: '5%',
+        paddingTop: 20,
+    },
+    pickerCard: {
+        backgroundColor: '#fff',
+        borderRadius: 40,
+        marginBottom: 15,
+        paddingLeft: '10%',
+        paddingRight: '10%',
+        paddingBottom: 32,
+        paddingTop: 32,
+    }
 });
