@@ -28,7 +28,7 @@ class NumPicker extends React.Component {
 function PickerCardGroup() {
     return (
         <ScrollView style={styles.settingWindowContainer}>
-            <View style={styles.pickerCard}>
+            <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
                 <Text style={styles.pickerTitle}>目標</Text>
                 <View style={styles.pickerContainer}>
                     <NumPicker selected={0} max={50}/>
@@ -37,7 +37,7 @@ function PickerCardGroup() {
                     <Text style={styles.pickerText}>セット</Text>
                 </View>
             </View>
-            <View style={styles.pickerCard}>
+            <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
                 <Text style={styles.pickerTitle}>インターバル</Text>
                 <View style={styles.pickerContainer}>
                     <NumPicker selected={0} max={9}/>
@@ -46,7 +46,7 @@ function PickerCardGroup() {
                     <Text style={styles.pickerText}>秒</Text>
                 </View>
             </View>
-            <View style={styles.pickerCard}>
+            <View style={[styles.pickerCard, styles.pickerCardMarginBottomLast]}>
                 <Text style={styles.pickerTitle}>間隔(ピッチ)</Text>
                 <View style={styles.pickerContainer}>
                     <Text style={styles.pickerText}>1回に</Text>
@@ -180,21 +180,21 @@ function CountNumGroup() {
 
 function IntervalMinutes(props) {
     return (
-        <Text>{props.nowminute}分</Text>
+        <Text><Text style={styles.intervalSecondStrong}>{props.nowminute}</Text>分</Text>
     );
 }
 
 function IntervalSeconds(props) {
     return (
-        <Text>{props.nowsecond}秒</Text>
+        <Text><Text style={styles.intervalSecondStrong}>{props.nowsecond}</Text>秒</Text>
     );
 }
 
 function IntervalNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
-            <Text>インターバル終了まで</Text>
-            <Text>
+            <Text style={styles.intervalTitle}>インターバル終了まで</Text>
+            <Text style={styles.nowSecond}>
                 <IntervalMinutes nowminute={1} />
                 <IntervalSeconds nowsecond={59} />
             </Text>
@@ -218,6 +218,7 @@ export default function App() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.mainContainer}>
+                <PickerCardGroup/>
                 <CounterDisplayGroup/>
                 <PrimaryButton value="スタート"/>
                 <SecondaryButton value="キャンセル" isDesabled={true} />
@@ -276,6 +277,12 @@ const styles = StyleSheet.create({
         paddingBottom: 32,
         paddingTop: 32,
     },
+    pickerCardMarginBottom: {
+        marginBottom: 15
+    },
+    pickerCardMarginBottomLast: {
+        marginBottom: 150
+    },
     pickerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -287,15 +294,14 @@ const styles = StyleSheet.create({
         paddingRight: 2
     },
     pickerItem: {
-        // height: 200,
         width: 100
     },
     circlePosition: {
-        position: 'absolute',
+        alignItems: 'center',
         left: 0,
+        position: 'absolute',
         right: 0,
         top: 198,
-        alignItems: 'center',
         width: '100%'
     },
     circleSvg: {
@@ -317,12 +323,12 @@ const styles = StyleSheet.create({
         fontSize: 44
     },
     countNumDisplay: {
-        position: 'absolute',
-        left: 0,
-        top: 215,
         alignItems: 'center',
         justifyContent: 'center',
         height: 245,
+        left: 0,
+        top: 215,
+        position: 'absolute',
         width: '100%'
     },
     countNum: {
@@ -336,5 +342,12 @@ const styles = StyleSheet.create({
     },
     nowSecondStrong: {
         fontSize: 80
+    },
+    intervalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    intervalSecondStrong: {
+        fontSize: 58
     }
 });
