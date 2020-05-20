@@ -60,7 +60,7 @@ function PickerCardGroup() {
 
 function PrimaryButton(props) {
     return (
-        <View style={styles.buttonPrimary}>
+        <View style={[styles.buttonPrimary, styles.buttonPosition]}>
             <Button
                 title={props.value}
                 type="solid"
@@ -73,7 +73,7 @@ function PrimaryButton(props) {
 function SecondaryButton(props) {
     if (props.isDesabled) {
         return (
-            <View style={styles.buttonSecondary}>
+            <View style={[styles.buttonSecondary, styles.buttonPosition]}>
                 <Button
                     title={props.value}
                     type="solid"
@@ -216,23 +216,22 @@ function CounterDisplayGroup() {
 
 export default function App() {
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.mainContainer}>
-                <PickerCardGroup/>
+        <View style={styles.background}>
+            <SafeAreaView style={styles.container}>
                 <CounterDisplayGroup/>
                 <PrimaryButton value="スタート"/>
                 <SecondaryButton value="キャンセル" isDesabled={true} />
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#fff',
+    background: {
+        backgroundColor: '#F1F0F2',
         flex: 1
     },
-    mainContainer: {
+    container: {
         flex: 1
     },
     button: {
@@ -242,20 +241,18 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         width: 150
     },
-    buttonPrimary: {
-        bottom: 45,
-        right: '5%',
+    buttonPosition: {
+        bottom: 70,
         position: 'absolute',
         width: 150
+    },
+    buttonPrimary: {
+        right: '8%'
     },
     buttonSecondary: {
-        bottom: 45,
-        left: '5%',
-        position: 'absolute',
-        width: 150
+        left: '8%'
     },
     settingWindowContainer: {
-        backgroundColor: '#F1F0F2',
         flex: 1,
         paddingLeft: '5%',
         paddingRight: '5%',
