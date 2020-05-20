@@ -218,6 +218,7 @@ export default function App() {
     return (
         <View style={styles.background}>
             <SafeAreaView style={styles.container}>
+                <PickerCardGroup/>
                 <CounterDisplayGroup/>
                 <PrimaryButton value="スタート"/>
                 <SecondaryButton value="キャンセル" isDesabled={true} />
