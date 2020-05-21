@@ -6,6 +6,9 @@ import Svg, { Circle } from 'react-native-svg';
 class NumPicker extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            selected: this.props.selected
+        };
     }
     render() {
         let array = [];
@@ -15,8 +18,11 @@ class NumPicker extends React.Component {
         }
         return(
             <Picker
-                selectedValue={this.props.selected}
-                style={styles.pickerItem}>
+                selectedValue={this.state.selected}
+                style={styles.pickerItem}
+                onValueChange={(itemValue, itemIndex) =>
+                    this.setState({selected: itemValue})
+                }>
                 {array.map((item) => {
                     return (<Picker.Item key={item} label={item.toString()} value={item} />)
                 })}
@@ -95,29 +101,27 @@ function SecondaryButton(props) {
     }
 }
 
-function NowSetTime(props) {
-    return (
-        <Text style={styles.numStrong}>{props.now}</Text>
-    );
-}
+class SetDisplayGroup extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            nowSet: 1
+        };
+    }
 
-function TotalSetTime(props) {
-    return (
-        <Text>{props.total}</Text>
-    );
-}
+    render() {
+        return (
+            <View style={styles.setDisplayPosition}>
+                <Text style={styles.nowTime}>
+                    <Text style={styles.numStrong}>{this.state.nowSet}</Text>
+                    /
+                    <Text>{this.props.totalSet}</Text>
+                    セット
+                </Text>
+            </View>
+        );
+    }
 
-function SetDisplayGroup() {
-    return (
-        <View style={styles.setDisplayPosition}>
-            <Text style={styles.nowTime}>
-                <NowSetTime now={2}/>
-                /
-                <TotalSetTime total={3}/>
-                セット
-            </Text>
-        </View>
-    );
 }
 
 function BackgroundCircle() {
@@ -130,84 +134,98 @@ function BackgroundCircle() {
     );
 }
 
-function CountCircle(props) {
-    return (
-        <View style={styles.circlePosition}>
-            <Svg height="280" width="280" style={styles.circleSvg}>
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#f87c54" fill="none" strokeLinecap={"round"} strokeDasharray={props.dasharray} />
-            </Svg>
-        </View>
-    );
+class CountCircle extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            dasharray: "280 876"
+        };
+    }
+
+    render() {
+        return (
+            <View style={styles.circlePosition}>
+                <Svg height="280" width="280" style={styles.circleSvg}>
+                    <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#f87c54" fill="none" strokeLinecap={"round"} strokeDasharray={this.state.dasharray} />
+                </Svg>
+            </View>
+        );
+    }
 }
 
-function NowTime(props) {
-    return (
-        <Text style={styles.numStrong}>{props.now}</Text>
-    );
+class TimeDisplayGroup extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            nowTime: 2
+        };
+    }
+
+    render() {
+        return (
+            <Text style={styles.countNum}>
+                <Text style={styles.numStrong}>{this.state.nowTime}</Text>
+                /
+                <Text>{this.props.totalTime}</Text>
+                回
+            </Text>
+        );
+    }
 }
 
-function TotalTime(props) {
-    return (
-        <Text>{props.total}</Text>
-    );
-}
+class NowSecond extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            nowSec: 0
+        };
+    }
 
-function TimeDisplayGroup() {
-    return (
-        <Text style={styles.countNum}>
-            <NowTime now={2}/>
-            /
-            <TotalTime total={10}/>
-            回
-        </Text>
-    );
-}
-
-function NowSecond(props) {
-    return (
-        <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{props.nowsec}</Text>/{props.pitchsec}秒</Text>
-    );
+    render() {
+        return (
+            <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{this.state.nowSec}</Text>/{this.props.pitchSec}秒</Text>
+        );
+    }
 }
 
 function CountNumGroup() {
     return (
         <View style={styles.countNumDisplay}>
-            <TimeDisplayGroup/>
-            <NowSecond nowsec={0} pitchsec={5}/>
+            <TimeDisplayGroup totalTime={10}/>
+            <NowSecond pitchSec={5}/>
         </View>
     );
 }
 
-function IntervalMinutes(props) {
-    return (
-        <Text><Text style={styles.intervalSecondStrong}>{props.nowminute}</Text>分</Text>
-    );
-}
+class IntervalNumGroup extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            nowIntervalMinutes: 1,
+            nowIntervalSeconds: 59
+        };
+    }
 
-function IntervalSeconds(props) {
-    return (
-        <Text><Text style={styles.intervalSecondStrong}>{props.nowsecond}</Text>秒</Text>
-    );
-}
+    render() {
+        return (
+            <View style={styles.countNumDisplay}>
+                <Text style={styles.intervalTitle}>インターバル終了まで</Text>
+                <Text style={styles.nowSecond}>
+                    <Text><Text style={styles.intervalSecondStrong}>{this.state.nowIntervalMinutes}</Text>分</Text>
+                    <Text><Text style={styles.intervalSecondStrong}>{this.state.nowIntervalSeconds}</Text>秒</Text>
+                </Text>
+            </View>
+        );
+    }
 
-function IntervalNumGroup(props) {
-    return (
-        <View style={styles.countNumDisplay}>
-            <Text style={styles.intervalTitle}>インターバル終了まで</Text>
-            <Text style={styles.nowSecond}>
-                <IntervalMinutes nowminute={1} />
-                <IntervalSeconds nowsecond={59} />
-            </Text>
-        </View>
-    );
 }
 
 function CounterDisplayGroup() {
     return (
         <View>
-            <SetDisplayGroup/>
+            <SetDisplayGroup totalSet={4}/>
             <BackgroundCircle/>
-            <CountCircle dasharray={"280 876"}/>
+            <CountCircle/>
             <CountNumGroup/>
             <IntervalNumGroup/>
         </View>
