@@ -12,8 +12,10 @@ class NumPicker extends React.Component {
     }
     render() {
         let array = [];
-        const maxNum = this.props.max;
-        for (let i = 1; i <= maxNum; i++) {
+        const
+            minNum = this.props.min,
+            maxNum = this.props.max;
+        for (let i = minNum; i <= maxNum; i++) {
             array.push(i);
         }
         return(
@@ -31,24 +33,24 @@ class NumPicker extends React.Component {
     }
 }
 
-function PickerCardGroup() {
+function PickerCardGroup(props) {
     return (
         <ScrollView style={styles.settingWindowContainer}>
             <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
                 <Text style={styles.pickerTitle}>目標</Text>
                 <View style={styles.pickerContainer}>
-                    <NumPicker selected={0} max={50}/>
+                    <NumPicker selected={props.time} min={1} max={50}/>
                     <Text style={styles.pickerText}>回</Text>
-                    <NumPicker selected={1} max={10}/>
+                    <NumPicker selected={props.set} min={1} max={10}/>
                     <Text style={styles.pickerText}>セット</Text>
                 </View>
             </View>
             <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
                 <Text style={styles.pickerTitle}>インターバル</Text>
                 <View style={styles.pickerContainer}>
-                    <NumPicker selected={0} max={9}/>
+                    <NumPicker selected={props.intervalm} min={0} max={9}/>
                     <Text style={styles.pickerText}>分</Text>
-                    <NumPicker selected={0} max={59}/>
+                    <NumPicker selected={props.intervals} min={0} max={59}/>
                     <Text style={styles.pickerText}>秒</Text>
                 </View>
             </View>
@@ -56,7 +58,7 @@ function PickerCardGroup() {
                 <Text style={styles.pickerTitle}>間隔(ピッチ)</Text>
                 <View style={styles.pickerContainer}>
                     <Text style={styles.pickerText}>1回に</Text>
-                    <NumPicker selected={1} max={10}/>
+                    <NumPicker selected={props.pitch} min={1} max={10}/>
                     <Text style={styles.pickerText}>秒かける</Text>
                 </View>
             </View>
@@ -157,7 +159,7 @@ class TimeDisplayGroup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            nowTime: 2
+            nowTime: 0
         };
     }
 
@@ -188,11 +190,11 @@ class NowSecond extends React.Component {
     }
 }
 
-function CountNumGroup() {
+function CountNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
-            <TimeDisplayGroup totalTime={10}/>
-            <NowSecond pitchSec={5}/>
+            <TimeDisplayGroup totalTime={props.totaltime}/>
+            <NowSecond pitchSec={props.totalpitch}/>
         </View>
     );
 }
@@ -201,8 +203,8 @@ class IntervalNumGroup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            nowIntervalMinutes: 1,
-            nowIntervalSeconds: 59
+            nowIntervalMinutes: props.minutes,
+            nowIntervalSeconds: props.seconds
         };
     }
 
@@ -220,28 +222,42 @@ class IntervalNumGroup extends React.Component {
 
 }
 
-function CounterDisplayGroup() {
-    return (
-        <View>
-            <SetDisplayGroup totalSet={4}/>
-            <BackgroundCircle/>
-            <CountCircle/>
-            <CountNumGroup/>
-            <IntervalNumGroup/>
-        </View>
-    );
+class WorkoutVoiceCounter extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            nowStatus: "Setting",
+            settingTime: 1,
+            settingSet: 1,
+            settingPitch: 1,
+            settingIntervalMinutes: 0,
+            settingIntervalSeconds: 0
+        };
+    }
+
+    render() {
+        return (
+            <View style={styles.background}>
+                <SafeAreaView style={styles.container}>
+                    <PickerCardGroup time={this.state.settingTime} set={this.state.settingSet} pitch={this.state.settingPitch} intervalm={this.state.settingIntervalMinutes} intervals={this.state.settingIntervalSeconds} />
+
+                    <SetDisplayGroup totalSet={this.state.settingSet}/>
+                    <BackgroundCircle/>
+                    <CountCircle/>
+                    <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}/>
+                    <IntervalNumGroup minutes={this.state.settingIntervalMinutes} seconds={this.state.settingIntervalSeconds}/>
+
+                    <PrimaryButton value="スタート"/>
+                    <SecondaryButton value="キャンセル" isDesabled={true} />
+                </SafeAreaView>
+            </View>
+        );
+    }
 }
 
 export default function App() {
     return (
-        <View style={styles.background}>
-            <SafeAreaView style={styles.container}>
-                <PickerCardGroup/>
-                <CounterDisplayGroup/>
-                <PrimaryButton value="スタート"/>
-                <SecondaryButton value="キャンセル" isDesabled={true} />
-            </SafeAreaView>
-        </View>
+        <WorkoutVoiceCounter/>
     );
 }
 
