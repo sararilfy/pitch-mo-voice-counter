@@ -105,6 +105,7 @@ function PrimaryButton(props) {
                 title={props.value}
                 type="solid"
                 buttonStyle={styles.button}
+                onPress={props.onPress}
             />
         </View>
     );
@@ -124,11 +125,12 @@ function SecondaryButton(props) {
         );
     } else {
         return (
-            <View style={styles.buttonSecondary}>
+            <View style={[styles.buttonSecondary, styles.buttonPosition]}>
                 <Button
                     title={props.value}
                     type="solid"
                     buttonStyle={styles.button}
+                    onPress={props.onPress}
                 />
             </View>
         );
@@ -258,8 +260,10 @@ class WorkoutVoiceCounter extends React.Component {
     constructor(props) {
         super(props);
         this.handleSetValue = this.handleSetValue.bind(this);
+        this.handlePrimaryButton = this.handlePrimaryButton.bind(this);
+        this.handleSecondaryButton = this.handleSecondaryButton.bind(this);
         this.state = {
-            nowStatus: "Setting",
+            nowStatus: "SETTING",
             settingTime: 1,
             settingSet: 1,
             settingPitch: 1,
@@ -268,31 +272,69 @@ class WorkoutVoiceCounter extends React.Component {
         };
     }
 
+    /**
+     * Function pickers set value
+     * @param stateName
+     * @param num
+     */
     handleSetValue(stateName, num) {
         this.setState({[stateName]: num});
     }
 
+    /**
+     * Functions buttons
+     */
+    handlePrimaryButton = () => {
+        this.setState({
+            nowStatus: 'COUNTER'
+        });
+    };
+
+    handleSecondaryButton = () => {
+        this.setState({
+            nowStatus: 'SETTING'
+        });
+    }
+
     render() {
+        let view,
+        countView;
+
+        switch (this.state.nowStatus) {
+            // TODO: case "PREPARE"
+            case "COUNTER":
+                countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}/>;
+                break;
+            case "INTERVAL":
+                countView = <IntervalNumGroup minutes={this.state.settingIntervalMinutes} seconds={this.state.settingIntervalSeconds}/>;
+                break;
+            default:
+        }
+
+        if (this.state.nowStatus === "SETTING") {
+            view = <PickerCardGroup
+                time={this.state.settingTime}
+                set={this.state.settingSet}
+                pitch={this.state.settingPitch}
+                intervalm={this.state.settingIntervalMinutes}
+                intervals={this.state.settingIntervalSeconds}
+                handleSetValue={(stateName, num) => this.handleSetValue(stateName, num)}
+            />;
+        } else {
+            view = <View>
+                <SetDisplayGroup totalSet={this.state.settingSet}/>
+                <BackgroundCircle/>
+                <CountCircle/>
+                {countView}
+            </View>;
+        }
+
         return (
             <View style={styles.background}>
                 <SafeAreaView style={styles.container}>
-                    <PickerCardGroup
-                        time={this.state.settingTime}
-                        set={this.state.settingSet}
-                        pitch={this.state.settingPitch}
-                        intervalm={this.state.settingIntervalMinutes}
-                        intervals={this.state.settingIntervalSeconds}
-                        handleSetValue={(stateName, num) => this.handleSetValue(stateName, num)}
-                    />
-
-                    <SetDisplayGroup totalSet={this.state.settingSet}/>
-                    <BackgroundCircle/>
-                    <CountCircle/>
-                    <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}/>
-                    <IntervalNumGroup minutes={this.state.settingIntervalMinutes} seconds={this.state.settingIntervalSeconds}/>
-
-                    <PrimaryButton value="スタート"/>
-                    <SecondaryButton value="キャンセル" isDesabled={true} />
+                    {view}
+                    <PrimaryButton value="スタート" onPress={this.handlePrimaryButton}/>
+                    <SecondaryButton value="キャンセル" isDesabled={true} onPress={this.handleSecondaryButton} />
                 </SafeAreaView>
             </View>
         );
