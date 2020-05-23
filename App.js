@@ -22,8 +22,10 @@ class NumPicker extends React.Component {
             <Picker
                 selectedValue={this.state.selected}
                 style={styles.pickerItem}
-                onValueChange={(itemValue, itemIndex) =>
-                    this.setState({selected: itemValue})
+                onValueChange={(itemValue, itemIndex) => {
+                    this.setState({selected: itemValue});
+                    this.props.handleSetValue(this.props.statename, itemValue);
+                }
                 }>
                 {array.map((item) => {
                     return (<Picker.Item key={item} label={item.toString()} value={item} />)
@@ -39,18 +41,42 @@ function PickerCardGroup(props) {
             <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
                 <Text style={styles.pickerTitle}>目標</Text>
                 <View style={styles.pickerContainer}>
-                    <NumPicker selected={props.time} min={1} max={50}/>
+                    <NumPicker
+                        selected={props.time}
+                        min={1}
+                        max={50}
+                        handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
+                        statename={'settingTime'}
+                    />
                     <Text style={styles.pickerText}>回</Text>
-                    <NumPicker selected={props.set} min={1} max={10}/>
+                    <NumPicker
+                        selected={props.set}
+                        min={1}
+                        max={10}
+                        handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
+                        statename={'settingSet'}
+                    />
                     <Text style={styles.pickerText}>セット</Text>
                 </View>
             </View>
             <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
                 <Text style={styles.pickerTitle}>インターバル</Text>
                 <View style={styles.pickerContainer}>
-                    <NumPicker selected={props.intervalm} min={0} max={9}/>
+                    <NumPicker
+                        selected={props.intervalm}
+                        min={0}
+                        max={9}
+                        handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
+                        statename={'settingIntervalMinutes'}
+                    />
                     <Text style={styles.pickerText}>分</Text>
-                    <NumPicker selected={props.intervals} min={0} max={59}/>
+                    <NumPicker
+                        selected={props.intervals}
+                        min={0}
+                        max={59}
+                        handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
+                        statename={'settingIntervalSeconds'}
+                    />
                     <Text style={styles.pickerText}>秒</Text>
                 </View>
             </View>
@@ -58,7 +84,13 @@ function PickerCardGroup(props) {
                 <Text style={styles.pickerTitle}>間隔(ピッチ)</Text>
                 <View style={styles.pickerContainer}>
                     <Text style={styles.pickerText}>1回に</Text>
-                    <NumPicker selected={props.pitch} min={1} max={10}/>
+                    <NumPicker
+                        selected={props.pitch}
+                        min={1}
+                        max={10}
+                        handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
+                        statename={'settingPitch'}
+                    />
                     <Text style={styles.pickerText}>秒かける</Text>
                 </View>
             </View>
@@ -225,6 +257,7 @@ class IntervalNumGroup extends React.Component {
 class WorkoutVoiceCounter extends React.Component {
     constructor(props) {
         super(props);
+        this.handleSetValue = this.handleSetValue.bind(this);
         this.state = {
             nowStatus: "Setting",
             settingTime: 1,
@@ -235,11 +268,22 @@ class WorkoutVoiceCounter extends React.Component {
         };
     }
 
+    handleSetValue(stateName, num) {
+        this.setState({[stateName]: num});
+    }
+
     render() {
         return (
             <View style={styles.background}>
                 <SafeAreaView style={styles.container}>
-                    <PickerCardGroup time={this.state.settingTime} set={this.state.settingSet} pitch={this.state.settingPitch} intervalm={this.state.settingIntervalMinutes} intervals={this.state.settingIntervalSeconds} />
+                    <PickerCardGroup
+                        time={this.state.settingTime}
+                        set={this.state.settingSet}
+                        pitch={this.state.settingPitch}
+                        intervalm={this.state.settingIntervalMinutes}
+                        intervals={this.state.settingIntervalSeconds}
+                        handleSetValue={(stateName, num) => this.handleSetValue(stateName, num)}
+                    />
 
                     <SetDisplayGroup totalSet={this.state.settingSet}/>
                     <BackgroundCircle/>
