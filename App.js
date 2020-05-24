@@ -112,7 +112,7 @@ function PrimaryButton(props) {
 }
 
 function SecondaryButton(props) {
-    if (props.isDesabled) {
+    if (props.isDisabled) {
         return (
             <View style={[styles.buttonSecondary, styles.buttonPosition]}>
                 <Button
@@ -256,6 +256,22 @@ class IntervalNumGroup extends React.Component {
 
 }
 
+class PrepareNumGroup extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <View style={styles.countNumDisplay}>
+                <Text style={styles.nowSecond}>
+                    <Text><Text style={styles.intervalSecondStrong}>{this.props.count}</Text></Text>
+                </Text>
+            </View>
+        );
+    }
+}
+
 class WorkoutVoiceCounter extends React.Component {
     constructor(props) {
         super(props);
@@ -268,7 +284,11 @@ class WorkoutVoiceCounter extends React.Component {
             settingSet: 1,
             settingPitch: 1,
             settingIntervalMinutes: 0,
-            settingIntervalSeconds: 0
+            settingIntervalSeconds: 0,
+            backgroundColor: "#F1F0F2",
+            nowPrepareCount: 5,
+            primaryButtonLabel: "スタート",
+            secondaryButtonIsDisabled: true
         };
     }
 
@@ -281,13 +301,47 @@ class WorkoutVoiceCounter extends React.Component {
         this.setState({[stateName]: num});
     }
 
+    handleStartCount() {
+        this.setState({
+            nowStatus: "COUNTER"
+        });
+    }
+
     /**
      * Functions buttons
      */
     handlePrimaryButton = () => {
-        this.setState({
-            nowStatus: 'COUNTER'
-        });
+        if (this.state.nowStatus === "SETTING"){
+            this.setState({
+                nowStatus: 'PREPARE',
+                backgroundColor: "#FFFFFF",
+                primaryButtonLabel: "一時停止",
+                secondaryButtonIsDisabled: false
+            });
+            let time = 5,
+                label = '';
+            // TODO: function Cancel
+            // TODO: function Pause
+            // TODO: AUTO STOP
+            const timerId = setInterval(() => {
+                time--;
+                switch (time) {
+                    case 0:
+                        label = 'スタート';
+                        break;
+                    case -1:
+                        clearInterval(timerId);
+                        this.handleStartCount();
+                        break;
+                    default:
+                        label = time;
+                        break;
+                }
+                this.setState({
+                    nowPrepareCount: label,
+                });
+            }, 1000);
+        }
     };
 
     handleSecondaryButton = () => {
@@ -301,7 +355,9 @@ class WorkoutVoiceCounter extends React.Component {
         countView;
 
         switch (this.state.nowStatus) {
-            // TODO: case "PREPARE"
+            case "PREPARE":
+                countView = <PrepareNumGroup count={this.state.nowPrepareCount}/>;
+                break;
             case "COUNTER":
                 countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}/>;
                 break;
@@ -330,11 +386,11 @@ class WorkoutVoiceCounter extends React.Component {
         }
 
         return (
-            <View style={styles.background}>
+            <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
                 <SafeAreaView style={styles.container}>
                     {view}
-                    <PrimaryButton value="スタート" onPress={this.handlePrimaryButton}/>
-                    <SecondaryButton value="キャンセル" isDesabled={true} onPress={this.handleSecondaryButton} />
+                    <PrimaryButton value={this.state.primaryButtonLabel} onPress={this.handlePrimaryButton}/>
+                    <SecondaryButton value="キャンセル" isDisabled={this.state.secondaryButtonIsDisabled} onPress={this.handleSecondaryButton} />
                 </SafeAreaView>
             </View>
         );
@@ -349,7 +405,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
     background: {
-        backgroundColor: '#F1F0F2',
+        // backgroundColor: '#F1F0F2',
         flex: 1
     },
     container: {
