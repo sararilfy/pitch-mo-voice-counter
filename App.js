@@ -3,7 +3,7 @@ import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-
 import { Button } from 'react-native-elements';
 import Svg, { Circle } from 'react-native-svg';
 
-const CIRCLE_STROKE_SIZE_MAX = 876;
+const CIRCLE_STROKE_SIZE_MAX = 813;
 
 let
     pauseFlg = false;
@@ -213,7 +213,7 @@ function TimeDisplayGroup(props) {
 function NowSecond(props) {
     if (props.isend) {
         return (
-            <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{props.countpitch}</Text></Text>
+            <Text style={styles.nowSecond}><Text style={styles.endTextStrong}>{props.countpitch}</Text></Text>
         );
     } else {
         return (
@@ -286,7 +286,7 @@ class WorkoutVoiceCounter extends React.Component {
             secondaryButtonIsDisabled: true,
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
-            nowCircleStrokeDasharray: "0 876",
+            nowCircleStrokeDasharray: "0 813",
             isCountEnd: false
         };
     }
@@ -312,7 +312,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowTime = 0,
             flg = 0,
             circleSize = 0;
-        const circleMoveSize = Math.ceil(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
+        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
             if (pauseFlg === false) {
                 time++;
@@ -339,7 +339,8 @@ class WorkoutVoiceCounter extends React.Component {
                             secondaryButtonLabel: "ホームへ",
                             primaryButtonIsDisabled: true,
                             nowPitchSecondCount: label,
-                            isCountEnd: true
+                            isCountEnd: true,
+                            nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
                         });
                     }
                     flg = 0;
@@ -577,6 +578,9 @@ const styles = StyleSheet.create({
     },
     nowSecondStrong: {
         fontSize: 80
+    },
+    endTextStrong: {
+        fontSize: 62
     },
     intervalTitle: {
         fontSize: 18,
