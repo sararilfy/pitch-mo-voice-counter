@@ -3,6 +3,8 @@ import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-
 import { Button } from 'react-native-elements';
 import Svg, { Circle } from 'react-native-svg';
 
+const CIRCLE_STROKE_SIZE_MAX = 876;
+
 class NumPicker extends React.Component {
     constructor(props) {
         super(props);
@@ -99,16 +101,30 @@ function PickerCardGroup(props) {
 }
 
 function PrimaryButton(props) {
-    return (
-        <View style={[styles.buttonPrimary, styles.buttonPosition]}>
-            <Button
-                title={props.value}
-                type="solid"
-                buttonStyle={styles.button}
-                onPress={props.onPress}
-            />
-        </View>
-    );
+    if (props.isDisabled) {
+        return (
+            <View style={[styles.buttonPrimary, styles.buttonPosition]}>
+                <Button
+                    title={props.value}
+                    type="solid"
+                    disabled
+                    buttonStyle={styles.button}
+                    onPress={props.onPress}
+                />
+            </View>
+        );
+    } else {
+        return (
+            <View style={[styles.buttonPrimary, styles.buttonPosition]}>
+                <Button
+                    title={props.value}
+                    type="solid"
+                    buttonStyle={styles.button}
+                    onPress={props.onPress}
+                />
+            </View>
+        );
+    }
 }
 
 function SecondaryButton(props) {
@@ -170,56 +186,35 @@ function BackgroundCircle() {
     );
 }
 
-class CountCircle extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            dasharray: "280 876"
-        };
-    }
-
-    render() {
-        return (
-            <View style={styles.circlePosition}>
-                <Svg height="280" width="280" style={styles.circleSvg}>
-                    <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#f87c54" fill="none" strokeLinecap={"round"} strokeDasharray={this.state.dasharray} />
-                </Svg>
-            </View>
-        );
-    }
+function CountCircle(props) {
+    return (
+        <View style={styles.circlePosition}>
+            <Svg height="280" width="280" style={styles.circleSvg}>
+                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#f87c54" fill="none" strokeLinecap={"round"} strokeDasharray={props.stroke} />
+            </Svg>
+        </View>
+    );
 }
 
-class TimeDisplayGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nowTime: 0
-        };
-    }
-
-    render() {
-        return (
-            <Text style={styles.countNum}>
-                <Text style={styles.numStrong}>{this.state.nowTime}</Text>
-                /
-                <Text>{this.props.totalTime}</Text>
-                回
-            </Text>
-        );
-    }
+function TimeDisplayGroup(props) {
+    return (
+        <Text style={styles.countNum}>
+            <Text style={styles.numStrong}>{props.counttime}</Text>
+            /
+            <Text>{props.totalTime}</Text>
+            回
+        </Text>
+    );
 }
 
-class NowSecond extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nowSec: 0
-        };
-    }
-
-    render() {
+function NowSecond(props) {
+    if (props.isend) {
         return (
-            <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{this.state.nowSec}</Text>/{this.props.pitchSec}秒</Text>
+            <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{props.countpitch}</Text></Text>
+        );
+    } else {
+        return (
+            <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{props.countpitch}</Text>/{props.pitchSec}秒</Text>
         );
     }
 }
@@ -227,8 +222,8 @@ class NowSecond extends React.Component {
 function CountNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
-            <TimeDisplayGroup totalTime={props.totaltime}/>
-            <NowSecond pitchSec={props.totalpitch}/>
+            <TimeDisplayGroup counttime={props.counttime} totalTime={props.totaltime}/>
+            <NowSecond countpitch={props.countpitch} pitchSec={props.totalpitch} isend={props.isend}/>
         </View>
     );
 }
@@ -256,20 +251,14 @@ class IntervalNumGroup extends React.Component {
 
 }
 
-class PrepareNumGroup extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <View style={styles.countNumDisplay}>
-                <Text style={styles.nowSecond}>
-                    <Text><Text style={styles.intervalSecondStrong}>{this.props.count}</Text></Text>
-                </Text>
-            </View>
-        );
-    }
+function PrepareNumGroup(props) {
+    return (
+        <View style={styles.countNumDisplay}>
+            <Text style={styles.nowSecond}>
+                <Text><Text style={styles.intervalSecondStrong}>{props.count}</Text></Text>
+            </Text>
+        </View>
+    );
 }
 
 class WorkoutVoiceCounter extends React.Component {
@@ -288,7 +277,13 @@ class WorkoutVoiceCounter extends React.Component {
             backgroundColor: "#F1F0F2",
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
-            secondaryButtonIsDisabled: true
+            secondaryButtonLabel: "キャンセル",
+            primaryButtonIsDisabled: false,
+            secondaryButtonIsDisabled: true,
+            nowTimeCount: 0,
+            nowPitchSecondCount: 0,
+            nowCircleStrokeDasharray: "0 876",
+            isCountEnd: false
         };
     }
 
@@ -305,6 +300,44 @@ class WorkoutVoiceCounter extends React.Component {
         this.setState({
             nowStatus: "COUNTER"
         });
+        let time = 0,
+            label = '',
+            nowTime = 0,
+            flg = 0,
+            circleSize = 0;
+        const circleMoveSize = Math.ceil(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
+        const timerId = setInterval(() => {
+            time++;
+            flg++;
+            if (flg <= this.state.settingPitch) {
+                circleSize = circleSize + circleMoveSize;
+                label = time;
+                this.setState({
+                    nowPitchSecondCount: label,
+                    nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                })
+            }
+            if (flg === this.state.settingPitch) {
+                nowTime++;
+                this.setState({
+                    nowTimeCount: nowTime
+                });
+            }
+            if (flg > this.state.settingPitch) {
+                if (nowTime >= this.state.settingTime) {
+                    clearInterval(timerId);
+                    label = '終了';
+                    this.setState({
+                        secondaryButtonLabel: "ホームへ",
+                        primaryButtonIsDisabled: true,
+                        nowPitchSecondCount: label,
+                        isCountEnd: true
+                    });
+                }
+                flg = 0;
+                time = 0;
+            }
+        }, 1000);
     }
 
     /**
@@ -359,7 +392,7 @@ class WorkoutVoiceCounter extends React.Component {
                 countView = <PrepareNumGroup count={this.state.nowPrepareCount}/>;
                 break;
             case "COUNTER":
-                countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}/>;
+                countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch} counttime={this.state.nowTimeCount} countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
                 break;
             case "INTERVAL":
                 countView = <IntervalNumGroup minutes={this.state.settingIntervalMinutes} seconds={this.state.settingIntervalSeconds}/>;
@@ -380,7 +413,7 @@ class WorkoutVoiceCounter extends React.Component {
             view = <View>
                 <SetDisplayGroup totalSet={this.state.settingSet}/>
                 <BackgroundCircle/>
-                <CountCircle/>
+                <CountCircle stroke={this.state.nowCircleStrokeDasharray}/>
                 {countView}
             </View>;
         }
@@ -389,8 +422,8 @@ class WorkoutVoiceCounter extends React.Component {
             <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
                 <SafeAreaView style={styles.container}>
                     {view}
-                    <PrimaryButton value={this.state.primaryButtonLabel} onPress={this.handlePrimaryButton}/>
-                    <SecondaryButton value="キャンセル" isDisabled={this.state.secondaryButtonIsDisabled} onPress={this.handleSecondaryButton} />
+                    <PrimaryButton value={this.state.primaryButtonLabel} isDisabled={this.state.primaryButtonIsDisabled} onPress={this.handlePrimaryButton}/>
+                    <SecondaryButton value={this.state.secondaryButtonLabel} isDisabled={this.state.secondaryButtonIsDisabled} onPress={this.handleSecondaryButton} />
                 </SafeAreaView>
             </View>
         );
@@ -405,7 +438,6 @@ export default function App() {
 
 const styles = StyleSheet.create({
     background: {
-        // backgroundColor: '#F1F0F2',
         flex: 1
     },
     container: {
