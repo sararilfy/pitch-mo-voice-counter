@@ -5,6 +5,9 @@ import Svg, { Circle } from 'react-native-svg';
 
 const CIRCLE_STROKE_SIZE_MAX = 876;
 
+let
+    pauseFlg = false;
+
 class NumPicker extends React.Component {
     constructor(props) {
         super(props);
@@ -267,6 +270,7 @@ class WorkoutVoiceCounter extends React.Component {
         this.handleSetValue = this.handleSetValue.bind(this);
         this.handlePrimaryButton = this.handlePrimaryButton.bind(this);
         this.handleSecondaryButton = this.handleSecondaryButton.bind(this);
+        this.handlePauseCount = this.handlePauseCount.bind(this);
         this.state = {
             nowStatus: "SETTING",
             settingTime: 1,
@@ -296,6 +300,9 @@ class WorkoutVoiceCounter extends React.Component {
         this.setState({[stateName]: num});
     }
 
+    /**
+     * Function counter
+     */
     handleStartCount() {
         this.setState({
             nowStatus: "COUNTER"
@@ -307,38 +314,57 @@ class WorkoutVoiceCounter extends React.Component {
             circleSize = 0;
         const circleMoveSize = Math.ceil(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
-            time++;
-            flg++;
-            if (flg <= this.state.settingPitch) {
-                circleSize = circleSize + circleMoveSize;
-                label = time;
-                this.setState({
-                    nowPitchSecondCount: label,
-                    nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
-                })
-            }
-            if (flg === this.state.settingPitch) {
-                nowTime++;
-                this.setState({
-                    nowTimeCount: nowTime
-                });
-            }
-            if (flg > this.state.settingPitch) {
-                if (nowTime >= this.state.settingTime) {
-                    clearInterval(timerId);
-                    label = '終了';
+            if (pauseFlg === false) {
+                time++;
+                flg++;
+                if (flg <= this.state.settingPitch) {
+                    circleSize = circleSize + circleMoveSize;
+                    label = time;
                     this.setState({
-                        secondaryButtonLabel: "ホームへ",
-                        primaryButtonIsDisabled: true,
                         nowPitchSecondCount: label,
-                        isCountEnd: true
+                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    })
+                }
+                if (flg === this.state.settingPitch) {
+                    nowTime++;
+                    this.setState({
+                        nowTimeCount: nowTime
                     });
                 }
-                flg = 0;
-                time = 0;
+                if (flg > this.state.settingPitch) {
+                    if (nowTime >= this.state.settingTime) {
+                        clearInterval(timerId);
+                        label = '終了';
+                        this.setState({
+                            secondaryButtonLabel: "ホームへ",
+                            primaryButtonIsDisabled: true,
+                            nowPitchSecondCount: label,
+                            isCountEnd: true
+                        });
+                    }
+                    flg = 0;
+                    time = 0;
+                }
             }
         }, 1000);
     }
+
+    /**
+     * Function pause count
+     */
+    handlePauseCount = () => {
+        if (pauseFlg === false) {
+            pauseFlg = true;
+            this.setState({
+                primaryButtonLabel: "再開"
+            });
+        } else {
+            pauseFlg = false;
+            this.setState({
+                primaryButtonLabel: "一時停止"
+            });
+        }
+    };
 
     /**
      * Functions buttons
@@ -354,26 +380,29 @@ class WorkoutVoiceCounter extends React.Component {
             let time = 5,
                 label = '';
             // TODO: function Cancel
-            // TODO: function Pause
             // TODO: AUTO STOP
             const timerId = setInterval(() => {
-                time--;
-                switch (time) {
-                    case 0:
-                        label = 'スタート';
-                        break;
-                    case -1:
-                        clearInterval(timerId);
-                        this.handleStartCount();
-                        break;
-                    default:
-                        label = time;
-                        break;
+                if (pauseFlg === false) {
+                    time--;
+                    switch (time) {
+                        case 0:
+                            label = 'スタート';
+                            break;
+                        case -1:
+                            clearInterval(timerId);
+                            this.handleStartCount();
+                            break;
+                        default:
+                            label = time;
+                            break;
+                    }
+                    this.setState({
+                        nowPrepareCount: label,
+                    });
                 }
-                this.setState({
-                    nowPrepareCount: label,
-                });
             }, 1000);
+        } else if (this.state.nowStatus === "PREPARE" || this.state.nowStatus === "COUNTER"){
+            this.handlePauseCount();
         }
     };
 
