@@ -159,27 +159,17 @@ function SecondaryButton(props) {
     }
 }
 
-class SetDisplayGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nowSet: 1
-        };
-    }
-
-    render() {
-        return (
-            <View style={styles.setDisplayPosition}>
-                <Text style={styles.nowTime}>
-                    <Text style={styles.numStrong}>{this.state.nowSet}</Text>
-                    /
-                    <Text>{this.props.totalSet}</Text>
-                    セット
-                </Text>
-            </View>
-        );
-    }
-
+function SetDisplayGroup (props) {
+    return (
+        <View style={styles.setDisplayPosition}>
+            <Text style={styles.nowTime}>
+                <Text style={styles.numStrong}>{props.countset}</Text>
+                /
+                <Text>{props.totalSet}</Text>
+                セット
+            </Text>
+        </View>
+    );
 }
 
 function BackgroundCircle() {
@@ -196,7 +186,7 @@ function CountCircle(props) {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280" style={styles.circleSvg}>
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#f87c54" fill="none" strokeLinecap={"round"} strokeDasharray={props.stroke} />
+                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke={props.color} fill="none" strokeLinecap={"round"} strokeDasharray={props.stroke} />
             </Svg>
         </View>
     );
@@ -290,6 +280,10 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
+            nowSetCount: 1,
+            nowIntervalMinutes: 0,
+            nowIntervalSeconds: 0,
+            circleStrokeColor: "#f87c54",
             isCountEnd: false
         };
     }
@@ -382,15 +376,20 @@ class WorkoutVoiceCounter extends React.Component {
                 }
                 if (flg > this.state.settingPitch) {
                     if (nowTime >= this.state.settingTime) {
-                        clearInterval(timerId);
-                        label = '終了';
-                        this.setState({
-                            secondaryButtonLabel: "ホームへ",
-                            primaryButtonIsDisabled: true,
-                            nowPitchSecondCount: label,
-                            isCountEnd: true,
-                            nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
-                        });
+                        if (this.state.nowSetCount === this.state.settingSet) {
+                            clearInterval(timerId);
+                            label = '終了';
+                            this.setState({
+                                secondaryButtonLabel: "ホームへ",
+                                primaryButtonIsDisabled: true,
+                                nowPitchSecondCount: label,
+                                isCountEnd: true,
+                                nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                            });
+                        } else if (this.state.nowSetCount < this.state.settingSet){
+                            clearInterval(timerId);
+                            this.countIntervalTime();
+                        }
                     }
                     flg = 0;
                     time = 0;
@@ -441,9 +440,26 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
+            circleStrokeColor: "#f87c54",
             isCountEnd: false
         });
     };
+
+    /**
+     * Function interval count
+     */
+    countIntervalTime = () => {
+        this.setState({
+            nowStatus: "INTERVAL",
+            nowTimeCount: 0,
+            nowPitchSecondCount: 0,
+            nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowIntervalMinutes: this.state.settingIntervalMinutes,
+            nowIntervalSeconds: this.state.settingIntervalSeconds,
+            circleStrokeColor: "#4AC08D"
+        });
+
+    }
 
     /**
      * Functions buttons
@@ -488,9 +504,9 @@ class WorkoutVoiceCounter extends React.Component {
             />;
         } else {
             view = <View>
-                <SetDisplayGroup totalSet={this.state.settingSet}/>
+                <SetDisplayGroup countset={this.state.nowSetCount} totalSet={this.state.settingSet}/>
                 <BackgroundCircle/>
-                <CountCircle stroke={this.state.nowCircleStrokeDasharray}/>
+                <CountCircle stroke={this.state.nowCircleStrokeDasharray} color={this.state.circleStrokeColor}/>
                 {countView}
             </View>;
         }
