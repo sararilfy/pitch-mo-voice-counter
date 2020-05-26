@@ -3,11 +3,13 @@ import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-
 import { Button } from 'react-native-elements';
 import Svg, { Circle } from 'react-native-svg';
 
-const CIRCLE_STROKE_SIZE_MAX = 813;
+const CIRCLE_STROKE_SIZE_MAX = 813,
+    AUTO_SWITCH_COUNT_MAX = 600;
 
 let
     pauseFlg = false,
-    cancelFlg = false;
+    cancelFlg = false,
+    autoCancelCount = 0;
 
 class NumPicker extends React.Component {
     constructor(props) {
@@ -313,7 +315,6 @@ class WorkoutVoiceCounter extends React.Component {
         });
         let time = 5,
             label = "";
-        // TODO: AUTO STOP
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -335,6 +336,11 @@ class WorkoutVoiceCounter extends React.Component {
                 this.setState({
                     nowPrepareCount: label,
                 });
+            } else if (pauseFlg === true) {
+                autoCancelCount++;
+            }
+            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                this.handleCancelCount();
             }
         }, 1000);
     }
@@ -389,6 +395,11 @@ class WorkoutVoiceCounter extends React.Component {
                     flg = 0;
                     time = 0;
                 }
+            } else if (pauseFlg === true) {
+                autoCancelCount++;
+            }
+            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                this.handleCancelCount();
             }
         }, 1000);
     }
@@ -418,6 +429,7 @@ class WorkoutVoiceCounter extends React.Component {
             cancelFlg = true;
         }
         pauseFlg = false;
+        autoCancelCount = 0;
         this.setState({
             nowStatus: "SETTING",
             backgroundColor: "#F1F0F2",
