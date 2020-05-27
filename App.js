@@ -3,7 +3,12 @@ import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-
 import { Button } from 'react-native-elements';
 import Svg, { Circle } from 'react-native-svg';
 
-const CIRCLE_STROKE_SIZE_MAX = 813,
+const
+    BACKGROUND_COLOR_SETTING = "#f1f0f2",
+    BACKGROUND_COLOR_COUNT = "#ffffff",
+    CIRCLE_STROKE_COLOR_NORMAL = "#f87c54",
+    CIRCLE_STROKE_COLOR_INTERVAL = "#4ac08d",
+    CIRCLE_STROKE_SIZE_MAX = 813,
     AUTO_SWITCH_COUNT_MAX = 600;
 
 let
@@ -176,7 +181,7 @@ function BackgroundCircle() {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280">
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="rgb(230, 230, 230)" fill="none" strokeLinecap={"round"} />
+                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#e6e6e6" fill="none" strokeLinecap={"round"} />
             </Svg>
         </View>
     );
@@ -271,7 +276,7 @@ class WorkoutVoiceCounter extends React.Component {
             settingPitch: 1,
             settingIntervalMinutes: 0,
             settingIntervalSeconds: 0,
-            backgroundColor: "#F1F0F2",
+            backgroundColor: BACKGROUND_COLOR_SETTING,
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
@@ -283,7 +288,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowSetCount: 1,
             nowIntervalMinutes: 0,
             nowIntervalSeconds: 0,
-            circleStrokeColor: "#f87c54",
+            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
             isCountEnd: false
         };
     }
@@ -303,7 +308,7 @@ class WorkoutVoiceCounter extends React.Component {
     handlePrepareCount() {
         this.setState({
             nowStatus: "PREPARE",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: BACKGROUND_COLOR_COUNT,
             primaryButtonLabel: "一時停止",
             secondaryButtonIsDisabled: false
         });
@@ -388,6 +393,7 @@ class WorkoutVoiceCounter extends React.Component {
                             });
                         } else if (this.state.nowSetCount < this.state.settingSet){
                             clearInterval(timerId);
+                            // TODO: If Interval Time is 0, go to counter.
                             this.countIntervalTime();
                         }
                     }
@@ -417,6 +423,7 @@ class WorkoutVoiceCounter extends React.Component {
             this.setState({
                 primaryButtonLabel: "一時停止"
             });
+            autoCancelCount = 0;
         }
     };
 
@@ -431,7 +438,7 @@ class WorkoutVoiceCounter extends React.Component {
         autoCancelCount = 0;
         this.setState({
             nowStatus: "SETTING",
-            backgroundColor: "#F1F0F2",
+            backgroundColor: BACKGROUND_COLOR_SETTING,
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
@@ -440,7 +447,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
-            circleStrokeColor: "#f87c54",
+            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
             isCountEnd: false
         });
     };
@@ -456,9 +463,38 @@ class WorkoutVoiceCounter extends React.Component {
             nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
             nowIntervalMinutes: this.state.settingIntervalMinutes,
             nowIntervalSeconds: this.state.settingIntervalSeconds,
-            circleStrokeColor: "#4AC08D"
+            circleStrokeColor: CIRCLE_STROKE_COLOR_INTERVAL
         });
-
+        let timeMinute = this.state.settingIntervalMinutes,
+            timeSecond = this.state.settingIntervalSeconds;
+        const timerId = setInterval(() => {
+            if (cancelFlg === true) {
+                clearInterval(timerId);
+                cancelFlg = false;
+            } else if (pauseFlg === false) {
+                timeSecond--;
+                // TODO: count down the seconds and minutes.
+                // switch (timeSecond) {
+                //     case 0:
+                //         break;
+                //     case -1:
+                //         clearInterval(timerId);
+                //         this.handleStartCount();
+                //         break;
+                //     default:
+                //         break;
+                // }
+                this.setState({
+                    nowIntervalMinutes: timeMinute,
+                    nowIntervalSeconds: timeSecond,
+                });
+            } else if (pauseFlg === true) {
+                autoCancelCount++;
+            }
+            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                this.handleCancelCount();
+            }
+        }, 1000);
     }
 
     /**
@@ -537,7 +573,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     button: {
-        backgroundColor: '#f87c54',
+        backgroundColor: CIRCLE_STROKE_COLOR_NORMAL,
         borderRadius: 150,
         paddingTop: 20,
         paddingBottom: 20,
