@@ -229,27 +229,16 @@ function CountNumGroup(props) {
     );
 }
 
-class IntervalNumGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nowIntervalMinutes: props.minutes,
-            nowIntervalSeconds: props.seconds
-        };
-    }
-
-    render() {
-        return (
-            <View style={styles.countNumDisplay}>
-                <Text style={styles.intervalTitle}>インターバル終了まで</Text>
-                <Text style={styles.nowSecond}>
-                    <Text><Text style={styles.intervalSecondStrong}>{this.state.nowIntervalMinutes}</Text>分</Text>
-                    <Text><Text style={styles.intervalSecondStrong}>{this.state.nowIntervalSeconds}</Text>秒</Text>
-                </Text>
-            </View>
-        );
-    }
-
+function IntervalNumGroup(props) {
+    return (
+        <View style={styles.countNumDisplay}>
+            <Text style={styles.intervalTitle}>インターバル終了まで</Text>
+            <Text style={styles.nowSecond}>
+                <Text><Text style={styles.intervalSecondStrong}>{props.minutes}</Text>分</Text>
+                <Text><Text style={styles.intervalSecondStrong}>{props.seconds}</Text>秒</Text>
+            </Text>
+        </View>
+    );
 }
 
 function PrepareNumGroup(props) {
@@ -394,7 +383,15 @@ class WorkoutVoiceCounter extends React.Component {
                         } else if (this.state.nowSetCount < this.state.settingSet){
                             clearInterval(timerId);
                             // TODO: If Interval Time is 0, go to counter.
-                            this.countIntervalTime();
+                            // TODO: Circle stroke dash array change
+                            if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
+                                this.setState({
+                                    nowSetCount: Number(this.state.nowSetCount + 1)
+                                });
+                                this.handleStartCount();
+                            } else {
+                                this.countIntervalTime();
+                            }
                         }
                     }
                     flg = 0;
@@ -472,21 +469,27 @@ class WorkoutVoiceCounter extends React.Component {
                 clearInterval(timerId);
                 cancelFlg = false;
             } else if (pauseFlg === false) {
-                timeSecond--;
-                // TODO: count down the seconds and minutes.
-                // switch (timeSecond) {
-                //     case 0:
-                //         break;
-                //     case -1:
-                //         clearInterval(timerId);
-                //         this.handleStartCount();
-                //         break;
-                //     default:
-                //         break;
-                // }
+                // TODO: Calc dash array and reduce.
+                if (timeSecond > 0) {
+                    timeSecond--;
+                } else if (timeSecond === 0) {
+                    if (timeMinute > 0) {
+                        timeMinute--;
+                        timeSecond = 59;
+                        this.setState({
+                            nowIntervalMinutes: timeMinute
+                        });
+                    } else if (timeMinute === 0) {
+                        clearInterval(timerId);
+                        this.setState({
+                            nowSetCount: Number(this.state.nowSetCount + 1)
+                        });
+                        // TODO: Circle color and dash array change.
+                        this.handleStartCount();
+                    }
+                }
                 this.setState({
-                    nowIntervalMinutes: timeMinute,
-                    nowIntervalSeconds: timeSecond,
+                    nowIntervalSeconds: timeSecond
                 });
             } else if (pauseFlg === true) {
                 autoCancelCount++;
@@ -524,7 +527,7 @@ class WorkoutVoiceCounter extends React.Component {
                 countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch} counttime={this.state.nowTimeCount} countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
                 break;
             case "INTERVAL":
-                countView = <IntervalNumGroup minutes={this.state.settingIntervalMinutes} seconds={this.state.settingIntervalSeconds}/>;
+                countView = <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds}/>;
                 break;
             default:
         }
