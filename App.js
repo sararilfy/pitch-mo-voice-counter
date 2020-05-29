@@ -337,14 +337,18 @@ class WorkoutVoiceCounter extends React.Component {
      * Function counter
      */
     handleStartCount() {
-        this.setState({
-            nowStatus: "COUNTER"
-        });
         let time = 0,
             label = '',
             nowTime = 0,
             flg = 0,
             circleSize = 0;
+        this.setState({
+            nowStatus: "COUNTER",
+            nowPitchSecondCount: 0,
+            nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowTimeCount: nowTime,
+            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL
+        });
         const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
@@ -370,8 +374,8 @@ class WorkoutVoiceCounter extends React.Component {
                 }
                 if (flg > this.state.settingPitch) {
                     if (nowTime >= this.state.settingTime) {
+                        clearInterval(timerId);
                         if (this.state.nowSetCount === this.state.settingSet) {
-                            clearInterval(timerId);
                             label = '終了';
                             this.setState({
                                 secondaryButtonLabel: "ホームへ",
@@ -381,9 +385,6 @@ class WorkoutVoiceCounter extends React.Component {
                                 nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
                             });
                         } else if (this.state.nowSetCount < this.state.settingSet){
-                            clearInterval(timerId);
-                            // TODO: If Interval Time is 0, go to counter.
-                            // TODO: Circle stroke dash array change
                             if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
                                 this.setState({
                                     nowSetCount: Number(this.state.nowSetCount + 1)
@@ -455,8 +456,6 @@ class WorkoutVoiceCounter extends React.Component {
     countIntervalTime = () => {
         this.setState({
             nowStatus: "INTERVAL",
-            nowTimeCount: 0,
-            nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
             nowIntervalMinutes: this.state.settingIntervalMinutes,
             nowIntervalSeconds: this.state.settingIntervalSeconds,
@@ -468,29 +467,31 @@ class WorkoutVoiceCounter extends React.Component {
             if (cancelFlg === true) {
                 clearInterval(timerId);
                 cancelFlg = false;
+                // TODO: Bug...Did'nt pause.
             } else if (pauseFlg === false) {
                 // TODO: Calc dash array and reduce.
                 if (timeSecond > 0) {
                     timeSecond--;
+                    this.setState({
+                        nowIntervalSeconds: timeSecond
+                    });
                 } else if (timeSecond === 0) {
                     if (timeMinute > 0) {
                         timeMinute--;
                         timeSecond = 59;
                         this.setState({
-                            nowIntervalMinutes: timeMinute
+                            nowIntervalMinutes: timeMinute,
+                            nowIntervalSeconds: timeSecond
                         });
                     } else if (timeMinute === 0) {
                         clearInterval(timerId);
                         this.setState({
                             nowSetCount: Number(this.state.nowSetCount + 1)
                         });
-                        // TODO: Circle color and dash array change.
+                        // TODO: Display "スタート"
                         this.handleStartCount();
                     }
                 }
-                this.setState({
-                    nowIntervalSeconds: timeSecond
-                });
             } else if (pauseFlg === true) {
                 autoCancelCount++;
             }
