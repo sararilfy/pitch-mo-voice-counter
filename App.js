@@ -168,10 +168,7 @@ function SetDisplayGroup (props) {
     return (
         <View style={styles.setDisplayPosition}>
             <Text style={styles.nowTime}>
-                <Text style={styles.numStrong}>{props.countset}</Text>
-                /
-                <Text>{props.totalSet}</Text>
-                セット
+                <Text style={styles.numStrong}>{props.countset}</Text>/{props.totalSet}セット
             </Text>
         </View>
     );
@@ -200,10 +197,7 @@ function CountCircle(props) {
 function TimeDisplayGroup(props) {
     return (
         <Text style={styles.countNum}>
-            <Text style={styles.numStrong}>{props.counttime}</Text>
-            /
-            <Text>{props.totalTime}</Text>
-            回
+            <Text style={styles.numStrong}>{props.counttime}</Text>/{props.totalTime}回
         </Text>
     );
 }
@@ -230,22 +224,32 @@ function CountNumGroup(props) {
 }
 
 function IntervalNumGroup(props) {
-    return (
-        <View style={styles.countNumDisplay}>
-            <Text style={styles.intervalTitle}>インターバル終了まで</Text>
-            <Text style={styles.nowSecond}>
-                <Text><Text style={styles.intervalSecondStrong}>{props.minutes}</Text>分</Text>
-                <Text><Text style={styles.intervalSecondStrong}>{props.seconds}</Text>秒</Text>
-            </Text>
-        </View>
-    );
+    if (props.isIntervalEnd) {
+        return (
+            <View style={styles.countNumDisplay}>
+                <Text style={styles.nowSecond}>
+                    <Text style={styles.intervalSecondStrong}>スタート</Text>
+                </Text>
+            </View>
+        );
+    } else {
+        return (
+            <View style={styles.countNumDisplay}>
+                <Text style={styles.intervalTitle}>インターバル終了まで</Text>
+                <Text style={styles.nowSecond}>
+                    <Text style={styles.intervalSecondStrong}>{props.minutes}</Text>分
+                    <Text style={styles.intervalSecondStrong}>{props.seconds}</Text>秒
+                </Text>
+            </View>
+        );
+    }
 }
 
 function PrepareNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
             <Text style={styles.nowSecond}>
-                <Text><Text style={styles.intervalSecondStrong}>{props.count}</Text></Text>
+                <Text style={styles.intervalSecondStrong}>{props.count}</Text>
             </Text>
         </View>
     );
@@ -326,9 +330,9 @@ class WorkoutVoiceCounter extends React.Component {
                 });
             } else if (pauseFlg === true) {
                 autoCancelCount++;
-            }
-            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                this.handleCancelCount();
+                if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                    this.handleCancelCount();
+                }
             }
         }, 1000);
     }
@@ -400,9 +404,9 @@ class WorkoutVoiceCounter extends React.Component {
                 }
             } else if (pauseFlg === true) {
                 autoCancelCount++;
-            }
-            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                this.handleCancelCount();
+                if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                    this.handleCancelCount();
+                }
             }
         }, 1000);
     }
@@ -442,11 +446,13 @@ class WorkoutVoiceCounter extends React.Component {
             secondaryButtonLabel: "キャンセル",
             primaryButtonIsDisabled: false,
             secondaryButtonIsDisabled: true,
+            nowSetCount: 1,
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
             circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
-            isCountEnd: false
+            isCountEnd: false,
+            isIntervalEnd: false
         });
     };
 
@@ -454,49 +460,57 @@ class WorkoutVoiceCounter extends React.Component {
      * Function interval count
      */
     countIntervalTime = () => {
+        let timeMinute = this.state.settingIntervalMinutes,
+            timeSecond = this.state.settingIntervalSeconds,
+            circleSize = CIRCLE_STROKE_SIZE_MAX;
+        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/Number(timeMinute * 60 + timeSecond));
         this.setState({
             nowStatus: "INTERVAL",
-            nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
-            nowIntervalMinutes: this.state.settingIntervalMinutes,
-            nowIntervalSeconds: this.state.settingIntervalSeconds,
-            circleStrokeColor: CIRCLE_STROKE_COLOR_INTERVAL
+            nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowIntervalMinutes: timeMinute,
+            nowIntervalSeconds: timeSecond,
+            circleStrokeColor: CIRCLE_STROKE_COLOR_INTERVAL,
+            isIntervalEnd: false
         });
-        let timeMinute = this.state.settingIntervalMinutes,
-            timeSecond = this.state.settingIntervalSeconds;
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
                 cancelFlg = false;
-                // TODO: Bug...Did'nt pause.
             } else if (pauseFlg === false) {
-                // TODO: Calc dash array and reduce.
-                if (timeSecond > 0) {
-                    timeSecond--;
+                if (timeMinute === 0 && timeSecond === 1) {
                     this.setState({
-                        nowIntervalSeconds: timeSecond
+                        isIntervalEnd: true
                     });
-                } else if (timeSecond === 0) {
-                    if (timeMinute > 0) {
-                        timeMinute--;
-                        timeSecond = 59;
-                        this.setState({
-                            nowIntervalMinutes: timeMinute,
-                            nowIntervalSeconds: timeSecond
-                        });
-                    } else if (timeMinute === 0) {
-                        clearInterval(timerId);
-                        this.setState({
-                            nowSetCount: Number(this.state.nowSetCount + 1)
-                        });
-                        // TODO: Display "スタート"
-                        this.handleStartCount();
-                    }
+                }
+                if (timeMinute === 0 && timeSecond === 0) {
+                    this.setState({
+                        nowSetCount: Number(this.state.nowSetCount + 1),
+                        nowCircleStrokeDasharray: '0 ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
+                    clearInterval(timerId);
+                    this.handleStartCount();
+                } else if (timeMinute > 0 && timeSecond === 0) {
+                    timeMinute--;
+                    timeSecond = 59;
+                    circleSize = circleSize - circleMoveSize;
+                    this.setState({
+                        nowIntervalMinutes: timeMinute,
+                        nowIntervalSeconds: timeSecond,
+                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
+                } else {
+                    timeSecond--;
+                    circleSize = circleSize - circleMoveSize;
+                    this.setState({
+                        nowIntervalSeconds: timeSecond,
+                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
                 }
             } else if (pauseFlg === true) {
                 autoCancelCount++;
-            }
-            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                this.handleCancelCount();
+                if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                    this.handleCancelCount();
+                }
             }
         }, 1000);
     }
@@ -507,7 +521,7 @@ class WorkoutVoiceCounter extends React.Component {
     handlePrimaryButton = () => {
         if (this.state.nowStatus === "SETTING"){
             this.handlePrepareCount();
-        } else if (this.state.nowStatus === "PREPARE" || this.state.nowStatus === "COUNTER"){
+        } else {
             this.handlePauseCount();
         }
     };
@@ -528,7 +542,7 @@ class WorkoutVoiceCounter extends React.Component {
                 countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch} counttime={this.state.nowTimeCount} countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
                 break;
             case "INTERVAL":
-                countView = <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds}/>;
+                countView = <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds} isIntervalEnd={this.state.isIntervalEnd}/>;
                 break;
             default:
         }
