@@ -3,7 +3,12 @@ import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-
 import { Button } from 'react-native-elements';
 import Svg, { Circle } from 'react-native-svg';
 
-const CIRCLE_STROKE_SIZE_MAX = 813,
+const
+    BACKGROUND_COLOR_SETTING = "#f1f0f2",
+    BACKGROUND_COLOR_COUNT = "#ffffff",
+    CIRCLE_STROKE_COLOR_NORMAL = "#f87c54",
+    CIRCLE_STROKE_COLOR_INTERVAL = "#4ac08d",
+    CIRCLE_STROKE_SIZE_MAX = 813,
     AUTO_SWITCH_COUNT_MAX = 600;
 
 let
@@ -159,34 +164,21 @@ function SecondaryButton(props) {
     }
 }
 
-class SetDisplayGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nowSet: 1
-        };
-    }
-
-    render() {
-        return (
-            <View style={styles.setDisplayPosition}>
-                <Text style={styles.nowTime}>
-                    <Text style={styles.numStrong}>{this.state.nowSet}</Text>
-                    /
-                    <Text>{this.props.totalSet}</Text>
-                    セット
-                </Text>
-            </View>
-        );
-    }
-
+function SetDisplayGroup (props) {
+    return (
+        <View style={styles.setDisplayPosition}>
+            <Text style={styles.nowTime}>
+                <Text style={styles.numStrong}>{props.countset}</Text>/{props.totalSet}セット
+            </Text>
+        </View>
+    );
 }
 
 function BackgroundCircle() {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280">
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="rgb(230, 230, 230)" fill="none" strokeLinecap={"round"} />
+                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#e6e6e6" fill="none" strokeLinecap={"round"} />
             </Svg>
         </View>
     );
@@ -196,7 +188,7 @@ function CountCircle(props) {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280" style={styles.circleSvg}>
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#f87c54" fill="none" strokeLinecap={"round"} strokeDasharray={props.stroke} />
+                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke={props.color} fill="none" strokeLinecap={"round"} strokeDasharray={props.stroke} />
             </Svg>
         </View>
     );
@@ -205,10 +197,7 @@ function CountCircle(props) {
 function TimeDisplayGroup(props) {
     return (
         <Text style={styles.countNum}>
-            <Text style={styles.numStrong}>{props.counttime}</Text>
-            /
-            <Text>{props.totalTime}</Text>
-            回
+            <Text style={styles.numStrong}>{props.counttime}</Text>/{props.totalTime}回
         </Text>
     );
 }
@@ -234,34 +223,33 @@ function CountNumGroup(props) {
     );
 }
 
-class IntervalNumGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nowIntervalMinutes: props.minutes,
-            nowIntervalSeconds: props.seconds
-        };
-    }
-
-    render() {
+function IntervalNumGroup(props) {
+    if (props.isIntervalEnd) {
+        return (
+            <View style={styles.countNumDisplay}>
+                <Text style={styles.nowSecond}>
+                    <Text style={styles.intervalSecondStrong}>スタート</Text>
+                </Text>
+            </View>
+        );
+    } else {
         return (
             <View style={styles.countNumDisplay}>
                 <Text style={styles.intervalTitle}>インターバル終了まで</Text>
                 <Text style={styles.nowSecond}>
-                    <Text><Text style={styles.intervalSecondStrong}>{this.state.nowIntervalMinutes}</Text>分</Text>
-                    <Text><Text style={styles.intervalSecondStrong}>{this.state.nowIntervalSeconds}</Text>秒</Text>
+                    <Text style={styles.intervalSecondStrong}>{props.minutes}</Text>分
+                    <Text style={styles.intervalSecondStrong}>{props.seconds}</Text>秒
                 </Text>
             </View>
         );
     }
-
 }
 
 function PrepareNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
             <Text style={styles.nowSecond}>
-                <Text><Text style={styles.intervalSecondStrong}>{props.count}</Text></Text>
+                <Text style={styles.intervalSecondStrong}>{props.count}</Text>
             </Text>
         </View>
     );
@@ -281,7 +269,7 @@ class WorkoutVoiceCounter extends React.Component {
             settingPitch: 1,
             settingIntervalMinutes: 0,
             settingIntervalSeconds: 0,
-            backgroundColor: "#F1F0F2",
+            backgroundColor: BACKGROUND_COLOR_SETTING,
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
@@ -290,6 +278,10 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
+            nowSetCount: 1,
+            nowIntervalMinutes: 0,
+            nowIntervalSeconds: 0,
+            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
             isCountEnd: false
         };
     }
@@ -309,7 +301,7 @@ class WorkoutVoiceCounter extends React.Component {
     handlePrepareCount() {
         this.setState({
             nowStatus: "PREPARE",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: BACKGROUND_COLOR_COUNT,
             primaryButtonLabel: "一時停止",
             secondaryButtonIsDisabled: false
         });
@@ -338,9 +330,9 @@ class WorkoutVoiceCounter extends React.Component {
                 });
             } else if (pauseFlg === true) {
                 autoCancelCount++;
-            }
-            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                this.handleCancelCount();
+                if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                    this.handleCancelCount();
+                }
             }
         }, 1000);
     }
@@ -349,14 +341,18 @@ class WorkoutVoiceCounter extends React.Component {
      * Function counter
      */
     handleStartCount() {
-        this.setState({
-            nowStatus: "COUNTER"
-        });
         let time = 0,
             label = '',
             nowTime = 0,
             flg = 0,
             circleSize = 0;
+        this.setState({
+            nowStatus: "COUNTER",
+            nowPitchSecondCount: 0,
+            nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowTimeCount: nowTime,
+            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL
+        });
         const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
@@ -383,23 +379,34 @@ class WorkoutVoiceCounter extends React.Component {
                 if (flg > this.state.settingPitch) {
                     if (nowTime >= this.state.settingTime) {
                         clearInterval(timerId);
-                        label = '終了';
-                        this.setState({
-                            secondaryButtonLabel: "ホームへ",
-                            primaryButtonIsDisabled: true,
-                            nowPitchSecondCount: label,
-                            isCountEnd: true,
-                            nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
-                        });
+                        if (this.state.nowSetCount === this.state.settingSet) {
+                            label = '終了';
+                            this.setState({
+                                secondaryButtonLabel: "ホームへ",
+                                primaryButtonIsDisabled: true,
+                                nowPitchSecondCount: label,
+                                isCountEnd: true,
+                                nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                            });
+                        } else if (this.state.nowSetCount < this.state.settingSet){
+                            if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
+                                this.setState({
+                                    nowSetCount: Number(this.state.nowSetCount + 1)
+                                });
+                                this.handleStartCount();
+                            } else {
+                                this.countIntervalTime();
+                            }
+                        }
                     }
                     flg = 0;
                     time = 0;
                 }
             } else if (pauseFlg === true) {
                 autoCancelCount++;
-            }
-            if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                this.handleCancelCount();
+                if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                    this.handleCancelCount();
+                }
             }
         }, 1000);
     }
@@ -418,6 +425,7 @@ class WorkoutVoiceCounter extends React.Component {
             this.setState({
                 primaryButtonLabel: "一時停止"
             });
+            autoCancelCount = 0;
         }
     };
 
@@ -432,18 +440,80 @@ class WorkoutVoiceCounter extends React.Component {
         autoCancelCount = 0;
         this.setState({
             nowStatus: "SETTING",
-            backgroundColor: "#F1F0F2",
+            backgroundColor: BACKGROUND_COLOR_SETTING,
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
             primaryButtonIsDisabled: false,
             secondaryButtonIsDisabled: true,
+            nowSetCount: 1,
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
-            isCountEnd: false
+            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
+            isCountEnd: false,
+            isIntervalEnd: false
         });
     };
+
+    /**
+     * Function interval count
+     */
+    countIntervalTime = () => {
+        let timeMinute = this.state.settingIntervalMinutes,
+            timeSecond = this.state.settingIntervalSeconds,
+            circleSize = CIRCLE_STROKE_SIZE_MAX;
+        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/Number(timeMinute * 60 + timeSecond));
+        this.setState({
+            nowStatus: "INTERVAL",
+            nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowIntervalMinutes: timeMinute,
+            nowIntervalSeconds: timeSecond,
+            circleStrokeColor: CIRCLE_STROKE_COLOR_INTERVAL,
+            isIntervalEnd: false
+        });
+        const timerId = setInterval(() => {
+            if (cancelFlg === true) {
+                clearInterval(timerId);
+                cancelFlg = false;
+            } else if (pauseFlg === false) {
+                if (timeMinute === 0 && timeSecond === 1) {
+                    this.setState({
+                        isIntervalEnd: true
+                    });
+                }
+                if (timeMinute === 0 && timeSecond === 0) {
+                    this.setState({
+                        nowSetCount: Number(this.state.nowSetCount + 1),
+                        nowCircleStrokeDasharray: '0 ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
+                    clearInterval(timerId);
+                    this.handleStartCount();
+                } else if (timeMinute > 0 && timeSecond === 0) {
+                    timeMinute--;
+                    timeSecond = 59;
+                    circleSize = circleSize - circleMoveSize;
+                    this.setState({
+                        nowIntervalMinutes: timeMinute,
+                        nowIntervalSeconds: timeSecond,
+                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
+                } else {
+                    timeSecond--;
+                    circleSize = circleSize - circleMoveSize;
+                    this.setState({
+                        nowIntervalSeconds: timeSecond,
+                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
+                }
+            } else if (pauseFlg === true) {
+                autoCancelCount++;
+                if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
+                    this.handleCancelCount();
+                }
+            }
+        }, 1000);
+    }
 
     /**
      * Functions buttons
@@ -451,7 +521,7 @@ class WorkoutVoiceCounter extends React.Component {
     handlePrimaryButton = () => {
         if (this.state.nowStatus === "SETTING"){
             this.handlePrepareCount();
-        } else if (this.state.nowStatus === "PREPARE" || this.state.nowStatus === "COUNTER"){
+        } else {
             this.handlePauseCount();
         }
     };
@@ -472,7 +542,7 @@ class WorkoutVoiceCounter extends React.Component {
                 countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch} counttime={this.state.nowTimeCount} countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
                 break;
             case "INTERVAL":
-                countView = <IntervalNumGroup minutes={this.state.settingIntervalMinutes} seconds={this.state.settingIntervalSeconds}/>;
+                countView = <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds} isIntervalEnd={this.state.isIntervalEnd}/>;
                 break;
             default:
         }
@@ -488,9 +558,9 @@ class WorkoutVoiceCounter extends React.Component {
             />;
         } else {
             view = <View>
-                <SetDisplayGroup totalSet={this.state.settingSet}/>
+                <SetDisplayGroup countset={this.state.nowSetCount} totalSet={this.state.settingSet}/>
                 <BackgroundCircle/>
-                <CountCircle stroke={this.state.nowCircleStrokeDasharray}/>
+                <CountCircle stroke={this.state.nowCircleStrokeDasharray} color={this.state.circleStrokeColor}/>
                 {countView}
             </View>;
         }
@@ -521,7 +591,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     button: {
-        backgroundColor: '#f87c54',
+        backgroundColor: CIRCLE_STROKE_COLOR_NORMAL,
         borderRadius: 150,
         paddingTop: 20,
         paddingBottom: 20,
