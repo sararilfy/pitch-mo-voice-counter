@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-native';
-import { Button } from 'react-native-elements';
-import Svg, { Circle } from 'react-native-svg';
+import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Button} from 'react-native-elements';
+import Svg, {Circle} from 'react-native-svg';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -287,6 +287,38 @@ class WorkoutVoiceCounter extends React.Component {
     }
 
     /**
+     * Function save data
+     * @param key
+     * @param value
+     * @returns {Promise<void>}
+     * @private
+     */
+    _storeData = async (key, value) => {
+        try {
+            await AsyncStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            alert('Error saving data');
+        }
+    };
+
+    /**
+     * Function get data
+     * @param key
+     * @returns {Promise<void>}
+     * @private
+     */
+    _retrieveData = async (key) => {
+        try {
+            const value = await AsyncStorage.getItem(key);
+            if (value !== null) {
+                return JSON.parse(value);
+            }
+        } catch (error) {
+            alert('Error retrieving data');
+        }
+    };
+
+    /**
      * Function pickers set value
      * @param stateName
      * @param num
@@ -521,6 +553,14 @@ class WorkoutVoiceCounter extends React.Component {
     handlePrimaryButton = () => {
         if (this.state.nowStatus === "SETTING"){
             this.handlePrepareCount();
+            let saveSettings = {
+                settingSet: this.state.settingSet,
+                settingTime: this.state.settingTime,
+                settingIntervalMinutes: this.state.settingIntervalMinutes,
+                settingIntervalSeconds: this.state.settingIntervalSeconds,
+                settingPitch: this.state.settingPitch
+            }
+            this._storeData('@WorkoutVoiceCounterSuperStore:saveSettings', saveSettings);
         } else {
             this.handlePauseCount();
         }
@@ -528,6 +568,20 @@ class WorkoutVoiceCounter extends React.Component {
 
     handleSecondaryButton = () => {
         this.handleCancelCount();
+    }
+
+    // TODO: componentWillMount
+     componentDidMount() {
+         this._retrieveData('@WorkoutVoiceCounterSuperStore:saveSettings').then(value => {
+             this.setState({
+                 settingTime: value.settingTime,
+                 settingSet: value.settingSet,
+                 settingPitch: value.settingPitch,
+                 settingIntervalMinutes: value.settingIntervalMinutes,
+                 settingIntervalSeconds: value.settingIntervalSeconds,
+             });
+             alert(this.state.settingTime);
+         });
     }
 
     render() {
