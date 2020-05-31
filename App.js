@@ -2,6 +2,7 @@ import React from 'react';
 import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, Image} from 'react-native';
 import {Button} from 'react-native-elements';
 import Svg, {Circle} from 'react-native-svg';
+import { Audio } from 'expo-av';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -15,6 +16,25 @@ let
     pauseFlg = false,
     cancelFlg = false,
     autoCancelCount = 0;
+
+class PlaylistItem {
+    constructor(uri) {
+        this.uri = uri;
+    }
+}
+
+const PLAYLIST = [{
+    "Start":
+    new PlaylistItem(
+        "./assets/sounds/info-girl1_info-girl1-start1.mp3",
+        false
+    ),
+    "end":
+    new PlaylistItem(
+        "./assets/sounds/info-girl1_info-girl1-syuuryou1.mp3",
+        false
+    )
+}]
 
 class NumPicker extends React.Component {
     constructor(props) {
