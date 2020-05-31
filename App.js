@@ -263,7 +263,7 @@ class WorkoutVoiceCounter extends React.Component {
         this.handleSecondaryButton = this.handleSecondaryButton.bind(this);
         this.handleCancelCount = this.handleCancelCount.bind(this);
         this.state = {
-            nowStatus: "SETTING",
+            nowStatus: "LOADING",
             settingTime: 1,
             settingSet: 1,
             settingPitch: 1,
@@ -284,6 +284,18 @@ class WorkoutVoiceCounter extends React.Component {
             circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
             isCountEnd: false
         };
+    }
+    componentDidMount() {
+        this._retrieveData('@WorkoutVoiceCounterSuperStore:saveSettings').then(value => {
+            this.setState({
+                nowStatus: "SETTING",
+                settingTime: value.settingTime,
+                settingSet: value.settingSet,
+                settingPitch: value.settingPitch,
+                settingIntervalMinutes: value.settingIntervalMinutes,
+                settingIntervalSeconds: value.settingIntervalSeconds,
+            });
+        });
     }
 
     /**
@@ -570,20 +582,6 @@ class WorkoutVoiceCounter extends React.Component {
         this.handleCancelCount();
     }
 
-    // TODO: componentWillMount
-     componentDidMount() {
-         this._retrieveData('@WorkoutVoiceCounterSuperStore:saveSettings').then(value => {
-             this.setState({
-                 settingTime: value.settingTime,
-                 settingSet: value.settingSet,
-                 settingPitch: value.settingPitch,
-                 settingIntervalMinutes: value.settingIntervalMinutes,
-                 settingIntervalSeconds: value.settingIntervalSeconds,
-             });
-             alert(this.state.settingTime);
-         });
-    }
-
     render() {
         let view,
         countView;
@@ -601,7 +599,9 @@ class WorkoutVoiceCounter extends React.Component {
             default:
         }
 
-        if (this.state.nowStatus === "SETTING") {
+        if (this.state.nowStatus === "LOADING") {
+            view = <View><Text>Loading...</Text></View>;
+        } else if (this.state.nowStatus === "SETTING") {
             view = <PickerCardGroup
                 time={this.state.settingTime}
                 set={this.state.settingSet}
