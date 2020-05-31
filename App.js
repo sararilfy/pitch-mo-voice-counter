@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Picker, SafeAreaView, ScrollView, Text } from 'react-native';
-import { Button } from 'react-native-elements';
-import Svg, { Circle } from 'react-native-svg';
+import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, Image} from 'react-native';
+import {Button} from 'react-native-elements';
+import Svg, {Circle} from 'react-native-svg';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -282,9 +282,68 @@ class WorkoutVoiceCounter extends React.Component {
             nowIntervalMinutes: 0,
             nowIntervalSeconds: 0,
             circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
-            isCountEnd: false
+            isCountEnd: false,
+            isLoaded: false
         };
     }
+    componentDidMount() {
+        this._retrieveData('@WorkoutVoiceCounterSuperStore:latestSettings').then(
+            value => {
+                if (value !== undefined) {
+                    this.setState({
+                        isLoaded: true,
+                        settingTime: value.settingTime,
+                        settingSet: value.settingSet,
+                        settingPitch: value.settingPitch,
+                        settingIntervalMinutes: value.settingIntervalMinutes,
+                        settingIntervalSeconds: value.settingIntervalSeconds,
+                    });
+                } else {
+                    this.setState({
+                        isLoaded: true
+                    });
+                }
+            },
+            error => {
+                this.setState({
+                isLoaded: true
+                });
+                alert(error);
+            }
+        );
+    }
+
+    /**
+     * Function save data
+     * @param key
+     * @param value
+     * @returns {Promise<void>}
+     * @private
+     */
+    _storeData = async (key, value) => {
+        try {
+            await AsyncStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            alert('Error saving data');
+        }
+    };
+
+    /**
+     * Function get data
+     * @param key
+     * @returns {Promise<void>}
+     * @private
+     */
+    _retrieveData = async (key) => {
+        try {
+            const value = await AsyncStorage.getItem(key);
+            if (value !== null) {
+                return JSON.parse(value);
+            }
+        } catch (error) {
+            alert('Error retrieving data');
+        }
+    };
 
     /**
      * Function pickers set value
@@ -521,6 +580,14 @@ class WorkoutVoiceCounter extends React.Component {
     handlePrimaryButton = () => {
         if (this.state.nowStatus === "SETTING"){
             this.handlePrepareCount();
+            let latestSettings = {
+                settingSet: this.state.settingSet,
+                settingTime: this.state.settingTime,
+                settingIntervalMinutes: this.state.settingIntervalMinutes,
+                settingIntervalSeconds: this.state.settingIntervalSeconds,
+                settingPitch: this.state.settingPitch
+            }
+            this._storeData('@WorkoutVoiceCounterSuperStore:latestSettings', latestSettings);
         } else {
             this.handlePauseCount();
         }
@@ -565,15 +632,25 @@ class WorkoutVoiceCounter extends React.Component {
             </View>;
         }
 
-        return (
-            <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
-                <SafeAreaView style={styles.container}>
-                    {view}
-                    <PrimaryButton value={this.state.primaryButtonLabel} isDisabled={this.state.primaryButtonIsDisabled} onPress={this.handlePrimaryButton}/>
-                    <SecondaryButton value={this.state.secondaryButtonLabel} isDisabled={this.state.secondaryButtonIsDisabled} onPress={this.handleSecondaryButton} />
-                </SafeAreaView>
-            </View>
-        );
+        if (!this.state.isLoaded) {
+            return (
+                <View style={[styles.background, {backgroundColor: "#FFFFFF"}]}>
+                    <SafeAreaView style={styles.container}>
+                        <View style={styles.loaderContainer}><Image style={styles.loader} source={require('./assets/img/loader.gif')}/></View>
+                    </SafeAreaView>
+                </View>
+            );
+        } else {
+            return (
+                <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
+                    <SafeAreaView style={styles.container}>
+                        {view}
+                        <PrimaryButton value={this.state.primaryButtonLabel} isDisabled={this.state.primaryButtonIsDisabled} onPress={this.handlePrimaryButton}/>
+                        <SecondaryButton value={this.state.secondaryButtonLabel} isDisabled={this.state.secondaryButtonIsDisabled} onPress={this.handleSecondaryButton} />
+                    </SafeAreaView>
+                </View>
+            );
+        }
     }
 }
 
@@ -705,5 +782,14 @@ const styles = StyleSheet.create({
     },
     intervalSecondStrong: {
         fontSize: 58
+    },
+    loaderContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    loader: {
+        height: 50,
+        width: 50
     }
 });
