@@ -1,8 +1,8 @@
 import React from 'react';
-import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, Image} from 'react-native';
+import {AsyncStorage, Image, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-elements';
 import Svg, {Circle} from 'react-native-svg';
-import { Audio } from 'expo-av';
+import {Audio} from 'expo-av';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -17,24 +17,20 @@ let
     cancelFlg = false,
     autoCancelCount = 0;
 
-class PlaylistItem {
-    constructor(uri) {
-        this.uri = uri;
-    }
-}
+let playbackInstance = new Audio.Sound();
 
-const PLAYLIST = [{
-    "Start":
-    new PlaylistItem(
-        "./assets/sounds/info-girl1_info-girl1-start1.mp3",
-        false
-    ),
-    "end":
-    new PlaylistItem(
-        "./assets/sounds/info-girl1_info-girl1-syuuryou1.mp3",
-        false
-    )
-}]
+// const PLAYLIST = [{
+//     "Start":
+//     new PlaylistItem(
+//         "./assets/sounds/info-girl1_info-girl1-start1.mp3",
+//         false
+//     ),
+//     "end":
+//     new PlaylistItem(
+//         "./assets/sounds/info-girl1_info-girl1-syuuryou1.mp3",
+//         false
+//     )
+// }]
 
 class NumPicker extends React.Component {
     constructor(props) {
@@ -333,6 +329,24 @@ class WorkoutVoiceCounter extends React.Component {
         );
     }
 
+    async _loadNewPlaybackInstance() {
+        if (playbackInstance != null) {
+            await playbackInstance.unloadAsync();
+            playbackInstance = null;
+        }
+        try {
+            const { sound: soundObject, status } = await Audio.Sound.createAsync(
+                // require("./assets/sounds/info-girl1_info-girl1-start1.mp3"),
+                require("/Users/nakayamakeie/Local_Sites/react-tutorial/workoutVoiceCounter/assets/sounds/go-kai.mp3"),
+                { shouldPlay: true }
+            );
+            playbackInstance = soundObject;
+            await playbackInstance.playAsync();
+        } catch (error) {
+            alert('An sound playing error occurred!');
+        }
+    }
+
     /**
      * Function save data
      * @param key
@@ -395,6 +409,7 @@ class WorkoutVoiceCounter extends React.Component {
                 switch (time) {
                     case 0:
                         label = "スタート";
+                        this._loadNewPlaybackInstance();
                         break;
                     case -1:
                         clearInterval(timerId);
