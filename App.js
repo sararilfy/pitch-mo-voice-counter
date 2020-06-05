@@ -3,6 +3,7 @@ import {AsyncStorage, Image, Picker, SafeAreaView, ScrollView, StyleSheet, Text,
 import {Button} from 'react-native-elements';
 import Svg, {Circle} from 'react-native-svg';
 import {Audio} from 'expo-av';
+import { Asset } from 'expo-asset';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -10,27 +11,44 @@ const
     CIRCLE_STROKE_COLOR_NORMAL = "#f87c54",
     CIRCLE_STROKE_COLOR_INTERVAL = "#4ac08d",
     CIRCLE_STROKE_SIZE_MAX = 813,
-    AUTO_SWITCH_COUNT_MAX = 600;
+    AUTO_SWITCH_COUNT_MAX = 600,
+    soundPath = './assets/sounds/',
+    SOUND_URI_NUMBER = [
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-ichi1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-ni1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-san1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-yon1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-go1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-roku1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-nana1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-hachi1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-kyuu1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-zyuu1.mp3')).uri,
+    ],
+    SOUND_URI_WORD = {
+        start: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-start1.mp3')).uri,
+        end: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-syuuryou1.mp3')).uri,
+        first: Asset.fromModule(require(soundPath + 'ichi-kai.mp3')).uri,
+        second: Asset.fromModule(require(soundPath + 'ni-kai.mp3')).uri,
+        third: Asset.fromModule(require(soundPath + 'san-kai.mp3')).uri,
+        forth: Asset.fromModule(require(soundPath + 'yon-kai.mp3')).uri,
+        fifth: Asset.fromModule(require(soundPath + 'go-kai.mp3')).uri,
+        sixth: Asset.fromModule(require(soundPath + 'roku-kai.mp3')).uri,
+        seventh: Asset.fromModule(require(soundPath + 'nana-kai.mp3')).uri,
+        eighth: Asset.fromModule(require(soundPath + 'hachi-kai.mp3')).uri,
+        ninth: Asset.fromModule(require(soundPath + 'kyuu-kai.mp3')).uri,
+        tenth: Asset.fromModule(require(soundPath + 'zyu-kai.mp3')).uri,
+        twentieth: Asset.fromModule(require(soundPath + 'nizyu-kai.mp3')).uri,
+        thirteenth: Asset.fromModule(require(soundPath + 'sanzyu-kai.mp3')).uri,
+        fourteenth: Asset.fromModule(require(soundPath + 'yonzyu-kai.mp3')).uri,
+        fifteenth: Asset.fromModule(require(soundPath + 'gozyu-kai.mp3')).uri
+    };
+
 
 let
     pauseFlg = false,
     cancelFlg = false,
     autoCancelCount = 0;
-
-let playbackInstance = new Audio.Sound();
-
-// const PLAYLIST = [{
-//     "Start":
-//     new PlaylistItem(
-//         "./assets/sounds/info-girl1_info-girl1-start1.mp3",
-//         false
-//     ),
-//     "end":
-//     new PlaylistItem(
-//         "./assets/sounds/info-girl1_info-girl1-syuuryou1.mp3",
-//         false
-//     )
-// }]
 
 class NumPicker extends React.Component {
     constructor(props) {
@@ -278,6 +296,7 @@ class WorkoutVoiceCounter extends React.Component {
         this.handlePrimaryButton = this.handlePrimaryButton.bind(this);
         this.handleSecondaryButton = this.handleSecondaryButton.bind(this);
         this.handleCancelCount = this.handleCancelCount.bind(this);
+        this.playbackInstance = null;
         this.state = {
             nowStatus: "SETTING",
             settingTime: 1,
@@ -329,19 +348,24 @@ class WorkoutVoiceCounter extends React.Component {
         );
     }
 
-    async _loadNewPlaybackInstance() {
-        if (playbackInstance != null) {
-            await playbackInstance.unloadAsync();
-            playbackInstance = null;
+    /**
+     * Load a sound and play
+     * @param soundLabel
+     * @returns {Promise<void>}
+     * @private
+     */
+    async _loadAndPlayNewPlaybackInstance(soundLabel) {
+        if (this.playbackInstance != null) {
+            await this.playbackInstance.unloadAsync();
+            this.playbackInstance = null;
         }
         try {
             const { sound: soundObject, status } = await Audio.Sound.createAsync(
-                // require("./assets/sounds/info-girl1_info-girl1-start1.mp3"),
-                require("/Users/nakayamakeie/Local_Sites/react-tutorial/workoutVoiceCounter/assets/sounds/go-kai.mp3"),
+                {uri: soundLabel},
                 { shouldPlay: true }
             );
-            playbackInstance = soundObject;
-            await playbackInstance.playAsync();
+            this.playbackInstance = soundObject;
+            await this.playbackInstance.playAsync();
         } catch (error) {
             alert('An sound playing error occurred!');
         }
@@ -400,6 +424,7 @@ class WorkoutVoiceCounter extends React.Component {
         });
         let time = 5,
             label = "";
+        this._loadAndPlayNewPlaybackInstance(SOUND_URI_NUMBER[Number(4)]);
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -409,13 +434,14 @@ class WorkoutVoiceCounter extends React.Component {
                 switch (time) {
                     case 0:
                         label = "スタート";
-                        this._loadNewPlaybackInstance();
+                        this._loadAndPlayNewPlaybackInstance(SOUND_URI_WORD["start"]);
                         break;
                     case -1:
                         clearInterval(timerId);
                         this.handleStartCount();
                         break;
                     default:
+                        this._loadAndPlayNewPlaybackInstance(SOUND_URI_NUMBER[Number(time - 1)]);
                         label = time;
                         break;
                 }
@@ -475,6 +501,7 @@ class WorkoutVoiceCounter extends React.Component {
                         clearInterval(timerId);
                         if (this.state.nowSetCount === this.state.settingSet) {
                             label = '終了';
+                            this._loadAndPlayNewPlaybackInstance(SOUND_URI_WORD["end"]);
                             this.setState({
                                 secondaryButtonLabel: "ホームへ",
                                 primaryButtonIsDisabled: true,
