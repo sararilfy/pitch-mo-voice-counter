@@ -501,20 +501,7 @@ class WorkoutVoiceCounter extends React.Component {
                     } else {
                         let str = String(nowTime).substring(1);
                         if (str === "0") {
-                            switch (nowTime) {
-                                case 20:
-                                    this._loadAndPlaySound(SOUND_URI_WORD[20]);
-                                    break;
-                                case 30:
-                                    this._loadAndPlaySound(SOUND_URI_WORD[30]);
-                                    break;
-                                case 40:
-                                    this._loadAndPlaySound(SOUND_URI_WORD[40]);
-                                    break;
-                                case 50:
-                                    this._loadAndPlaySound(SOUND_URI_WORD[50]);
-                                    break;
-                            }
+                            this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
                         } else {
                             this._loadAndPlaySound(SOUND_URI_WORD[str]);
                         }
