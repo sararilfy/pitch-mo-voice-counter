@@ -499,73 +499,24 @@ class WorkoutVoiceCounter extends React.Component {
                     if (nowTime <= 10) {
                         this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
                     } else {
-                        switch (nowTime) {
-                            case 11:
-                            case 21:
-                            case 31:
-                            case 41:
-                                this._loadAndPlaySound(SOUND_URI_WORD[1]);
-                                break;
-                            case 12:
-                            case 22:
-                            case 32:
-                            case 42:
-                                this._loadAndPlaySound(SOUND_URI_WORD[2]);
-                                break;
-                            case 13:
-                            case 23:
-                            case 33:
-                            case 43:
-                                this._loadAndPlaySound(SOUND_URI_WORD[3]);
-                                break;
-                            case 14:
-                            case 24:
-                            case 34:
-                            case 44:
-                                this._loadAndPlaySound(SOUND_URI_WORD[4]);
-                                break;
-                            case 15:
-                            case 25:
-                            case 35:
-                            case 45:
-                                this._loadAndPlaySound(SOUND_URI_WORD[5]);
-                                break;
-                            case 16:
-                            case 26:
-                            case 36:
-                            case 46:
-                                this._loadAndPlaySound(SOUND_URI_WORD[6]);
-                                break;
-                            case 17:
-                            case 27:
-                            case 37:
-                            case 47:
-                                this._loadAndPlaySound(SOUND_URI_WORD[7]);
-                                break;
-                            case 18:
-                            case 28:
-                            case 38:
-                            case 48:
-                                this._loadAndPlaySound(SOUND_URI_WORD[8]);
-                                break;
-                            case 19:
-                            case 29:
-                            case 39:
-                            case 49:
-                                this._loadAndPlaySound(SOUND_URI_WORD[9]);
-                                break;
-                            case 20:
-                                this._loadAndPlaySound(SOUND_URI_WORD[20]);
-                                break;
-                            case 30:
-                                this._loadAndPlaySound(SOUND_URI_WORD[30]);
-                                break;
-                            case 40:
-                                this._loadAndPlaySound(SOUND_URI_WORD[40]);
-                                break;
-                            case 50:
-                                this._loadAndPlaySound(SOUND_URI_WORD[50]);
-                                break;
+                        let str = String(nowTime).substring(1);
+                        if (str === "0") {
+                            switch (nowTime) {
+                                case 20:
+                                    this._loadAndPlaySound(SOUND_URI_WORD[20]);
+                                    break;
+                                case 30:
+                                    this._loadAndPlaySound(SOUND_URI_WORD[30]);
+                                    break;
+                                case 40:
+                                    this._loadAndPlaySound(SOUND_URI_WORD[40]);
+                                    break;
+                                case 50:
+                                    this._loadAndPlaySound(SOUND_URI_WORD[50]);
+                                    break;
+                            }
+                        } else {
+                            this._loadAndPlaySound(SOUND_URI_WORD[str]);
                         }
                     }
                 }
