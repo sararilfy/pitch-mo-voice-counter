@@ -28,20 +28,20 @@ const
     SOUND_URI_WORD = {
         start: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-start1.mp3')).uri,
         end: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-syuuryou1.mp3')).uri,
-        first: Asset.fromModule(require(soundPath + 'ichi-kai.mp3')).uri,
-        second: Asset.fromModule(require(soundPath + 'ni-kai.mp3')).uri,
-        third: Asset.fromModule(require(soundPath + 'san-kai.mp3')).uri,
-        forth: Asset.fromModule(require(soundPath + 'yon-kai.mp3')).uri,
-        fifth: Asset.fromModule(require(soundPath + 'go-kai.mp3')).uri,
-        sixth: Asset.fromModule(require(soundPath + 'roku-kai.mp3')).uri,
-        seventh: Asset.fromModule(require(soundPath + 'nana-kai.mp3')).uri,
-        eighth: Asset.fromModule(require(soundPath + 'hachi-kai.mp3')).uri,
-        ninth: Asset.fromModule(require(soundPath + 'kyuu-kai.mp3')).uri,
-        tenth: Asset.fromModule(require(soundPath + 'zyu-kai.mp3')).uri,
-        twentieth: Asset.fromModule(require(soundPath + 'nizyu-kai.mp3')).uri,
-        thirteenth: Asset.fromModule(require(soundPath + 'sanzyu-kai.mp3')).uri,
-        fourteenth: Asset.fromModule(require(soundPath + 'yonzyu-kai.mp3')).uri,
-        fifteenth: Asset.fromModule(require(soundPath + 'gozyu-kai.mp3')).uri
+        1: Asset.fromModule(require(soundPath + 'ichi-kai.mp3')).uri,
+        2: Asset.fromModule(require(soundPath + 'ni-kai.mp3')).uri,
+        3: Asset.fromModule(require(soundPath + 'san-kai.mp3')).uri,
+        4: Asset.fromModule(require(soundPath + 'yon-kai.mp3')).uri,
+        5: Asset.fromModule(require(soundPath + 'go-kai.mp3')).uri,
+        6: Asset.fromModule(require(soundPath + 'roku-kai.mp3')).uri,
+        7: Asset.fromModule(require(soundPath + 'nana-kai.mp3')).uri,
+        8: Asset.fromModule(require(soundPath + 'hachi-kai.mp3')).uri,
+        9: Asset.fromModule(require(soundPath + 'kyuu-kai.mp3')).uri,
+        10: Asset.fromModule(require(soundPath + 'zyu-kai.mp3')).uri,
+        20: Asset.fromModule(require(soundPath + 'nizyu-kai.mp3')).uri,
+        30: Asset.fromModule(require(soundPath + 'sanzyu-kai.mp3')).uri,
+        40: Asset.fromModule(require(soundPath + 'yonzyu-kai.mp3')).uri,
+        50: Asset.fromModule(require(soundPath + 'gozyu-kai.mp3')).uri
     };
 
 
@@ -354,7 +354,7 @@ class WorkoutVoiceCounter extends React.Component {
      * @returns {Promise<void>}
      * @private
      */
-    async _loadAndPlayNewPlaybackInstance(soundLabel) {
+    async _loadAndPlaySound(soundLabel) {
         if (this.playbackInstance != null) {
             await this.playbackInstance.unloadAsync();
             this.playbackInstance = null;
@@ -424,7 +424,7 @@ class WorkoutVoiceCounter extends React.Component {
         });
         let time = 5,
             label = "";
-        this._loadAndPlayNewPlaybackInstance(SOUND_URI_NUMBER[Number(4)]);
+        this._loadAndPlaySound(SOUND_URI_NUMBER[Number(4)]);
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -434,14 +434,14 @@ class WorkoutVoiceCounter extends React.Component {
                 switch (time) {
                     case 0:
                         label = "スタート";
-                        this._loadAndPlayNewPlaybackInstance(SOUND_URI_WORD["start"]);
+                        this._loadAndPlaySound(SOUND_URI_WORD["start"]);
                         break;
                     case -1:
                         clearInterval(timerId);
                         this.handleStartCount();
                         break;
                     default:
-                        this._loadAndPlayNewPlaybackInstance(SOUND_URI_NUMBER[Number(time - 1)]);
+                        this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
                         label = time;
                         break;
                 }
@@ -488,20 +488,93 @@ class WorkoutVoiceCounter extends React.Component {
                     this.setState({
                         nowPitchSecondCount: label,
                         nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
-                    })
+                    });
+                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
                 }
                 if (flg === this.state.settingPitch) {
                     nowTime++;
                     this.setState({
                         nowTimeCount: nowTime
                     });
+                    if (nowTime <= 10) {
+                        this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                    } else {
+                        switch (nowTime) {
+                            case 11:
+                            case 21:
+                            case 31:
+                            case 41:
+                                this._loadAndPlaySound(SOUND_URI_WORD[1]);
+                                break;
+                            case 12:
+                            case 22:
+                            case 32:
+                            case 42:
+                                this._loadAndPlaySound(SOUND_URI_WORD[2]);
+                                break;
+                            case 13:
+                            case 23:
+                            case 33:
+                            case 43:
+                                this._loadAndPlaySound(SOUND_URI_WORD[3]);
+                                break;
+                            case 14:
+                            case 24:
+                            case 34:
+                            case 44:
+                                this._loadAndPlaySound(SOUND_URI_WORD[4]);
+                                break;
+                            case 15:
+                            case 25:
+                            case 35:
+                            case 45:
+                                this._loadAndPlaySound(SOUND_URI_WORD[5]);
+                                break;
+                            case 16:
+                            case 26:
+                            case 36:
+                            case 46:
+                                this._loadAndPlaySound(SOUND_URI_WORD[6]);
+                                break;
+                            case 17:
+                            case 27:
+                            case 37:
+                            case 47:
+                                this._loadAndPlaySound(SOUND_URI_WORD[7]);
+                                break;
+                            case 18:
+                            case 28:
+                            case 38:
+                            case 48:
+                                this._loadAndPlaySound(SOUND_URI_WORD[8]);
+                                break;
+                            case 19:
+                            case 29:
+                            case 39:
+                            case 49:
+                                this._loadAndPlaySound(SOUND_URI_WORD[9]);
+                                break;
+                            case 20:
+                                this._loadAndPlaySound(SOUND_URI_WORD[20]);
+                                break;
+                            case 30:
+                                this._loadAndPlaySound(SOUND_URI_WORD[30]);
+                                break;
+                            case 40:
+                                this._loadAndPlaySound(SOUND_URI_WORD[40]);
+                                break;
+                            case 50:
+                                this._loadAndPlaySound(SOUND_URI_WORD[50]);
+                                break;
+                        }
+                    }
                 }
                 if (flg > this.state.settingPitch) {
                     if (nowTime >= this.state.settingTime) {
                         clearInterval(timerId);
                         if (this.state.nowSetCount === this.state.settingSet) {
                             label = '終了';
-                            this._loadAndPlayNewPlaybackInstance(SOUND_URI_WORD["end"]);
+                            this._loadAndPlaySound(SOUND_URI_WORD["end"]);
                             this.setState({
                                 secondaryButtonLabel: "ホームへ",
                                 primaryButtonIsDisabled: true,
