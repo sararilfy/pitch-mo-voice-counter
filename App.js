@@ -1,7 +1,9 @@
 import React from 'react';
-import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, Image} from 'react-native';
+import {AsyncStorage, Image, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-elements';
 import Svg, {Circle} from 'react-native-svg';
+import {Audio} from 'expo-av';
+import { Asset } from 'expo-asset';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -9,7 +11,42 @@ const
     CIRCLE_STROKE_COLOR_NORMAL = "#f87c54",
     CIRCLE_STROKE_COLOR_INTERVAL = "#4ac08d",
     CIRCLE_STROKE_SIZE_MAX = 813,
-    AUTO_SWITCH_COUNT_MAX = 600;
+    AUTO_SWITCH_COUNT_MAX = 600,
+    soundPath = './assets/sounds/',
+    SOUND_URI_NUMBER = [
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-ichi1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-ni1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-san1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-yon1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-go1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-roku1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-nana1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-hachi1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-kyuu1.mp3')).uri,
+        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-zyuu1.mp3')).uri,
+    ],
+    SOUND_URI_WORD = {
+        start: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-start1.mp3')).uri,
+        end: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-syuuryou1.mp3')).uri,
+        rest: Asset.fromModule(require(soundPath + 'kyuukei.mp3')).uri,
+        left1min: Asset.fromModule(require(soundPath + 'nokori-ichi-pun.mp3')).uri,
+        left30sec: Asset.fromModule(require(soundPath + 'nokori-sanzyuu-byou.mp3')).uri,
+        1: Asset.fromModule(require(soundPath + 'ichi-kai.mp3')).uri,
+        2: Asset.fromModule(require(soundPath + 'ni-kai.mp3')).uri,
+        3: Asset.fromModule(require(soundPath + 'san-kai.mp3')).uri,
+        4: Asset.fromModule(require(soundPath + 'yon-kai.mp3')).uri,
+        5: Asset.fromModule(require(soundPath + 'go-kai.mp3')).uri,
+        6: Asset.fromModule(require(soundPath + 'roku-kai.mp3')).uri,
+        7: Asset.fromModule(require(soundPath + 'nana-kai.mp3')).uri,
+        8: Asset.fromModule(require(soundPath + 'hachi-kai.mp3')).uri,
+        9: Asset.fromModule(require(soundPath + 'kyuu-kai.mp3')).uri,
+        10: Asset.fromModule(require(soundPath + 'zyu-kai.mp3')).uri,
+        20: Asset.fromModule(require(soundPath + 'nizyu-kai.mp3')).uri,
+        30: Asset.fromModule(require(soundPath + 'sanzyu-kai.mp3')).uri,
+        40: Asset.fromModule(require(soundPath + 'yonzyu-kai.mp3')).uri,
+        50: Asset.fromModule(require(soundPath + 'gozyu-kai.mp3')).uri
+    };
+
 
 let
     pauseFlg = false,
@@ -262,6 +299,7 @@ class WorkoutVoiceCounter extends React.Component {
         this.handlePrimaryButton = this.handlePrimaryButton.bind(this);
         this.handleSecondaryButton = this.handleSecondaryButton.bind(this);
         this.handleCancelCount = this.handleCancelCount.bind(this);
+        this.playbackInstance = null;
         this.state = {
             nowStatus: "SETTING",
             settingTime: 1,
@@ -311,6 +349,29 @@ class WorkoutVoiceCounter extends React.Component {
                 alert(error);
             }
         );
+    }
+
+    /**
+     * Load a sound and play
+     * @param soundLabel
+     * @returns {Promise<void>}
+     * @private
+     */
+    async _loadAndPlaySound(soundLabel) {
+        if (this.playbackInstance != null) {
+            await this.playbackInstance.unloadAsync();
+            this.playbackInstance = null;
+        }
+        try {
+            const { sound: soundObject, status } = await Audio.Sound.createAsync(
+                {uri: soundLabel},
+                { shouldPlay: true }
+            );
+            this.playbackInstance = soundObject;
+            await this.playbackInstance.playAsync();
+        } catch (error) {
+            alert('An sound playing error occurred!');
+        }
     }
 
     /**
@@ -366,6 +427,7 @@ class WorkoutVoiceCounter extends React.Component {
         });
         let time = 5,
             label = "";
+        this._loadAndPlaySound(SOUND_URI_NUMBER[Number(4)]);
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -375,12 +437,14 @@ class WorkoutVoiceCounter extends React.Component {
                 switch (time) {
                     case 0:
                         label = "スタート";
+                        this._loadAndPlaySound(SOUND_URI_WORD["start"]);
                         break;
                     case -1:
                         clearInterval(timerId);
                         this.handleStartCount();
                         break;
                     default:
+                        this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
                         label = time;
                         break;
                 }
@@ -427,7 +491,8 @@ class WorkoutVoiceCounter extends React.Component {
                     this.setState({
                         nowPitchSecondCount: label,
                         nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
-                    })
+                    });
+                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
                 }
                 if (flg === this.state.settingPitch) {
                     nowTime++;
@@ -440,6 +505,7 @@ class WorkoutVoiceCounter extends React.Component {
                         clearInterval(timerId);
                         if (this.state.nowSetCount === this.state.settingSet) {
                             label = '終了';
+                            this._loadAndPlaySound(SOUND_URI_WORD["end"]);
                             this.setState({
                                 secondaryButtonLabel: "ホームへ",
                                 primaryButtonIsDisabled: true,
@@ -455,6 +521,18 @@ class WorkoutVoiceCounter extends React.Component {
                                 this.handleStartCount();
                             } else {
                                 this.countIntervalTime();
+                                this._loadAndPlaySound(SOUND_URI_WORD["rest"]);
+                            }
+                        }
+                    } else {
+                        if (nowTime <= 10) {
+                            this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                        } else {
+                            let str = String(nowTime).substring(1);
+                            if (str === "0") {
+                                this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                            } else {
+                                this._loadAndPlaySound(SOUND_URI_WORD[str]);
                             }
                         }
                     }
@@ -540,6 +618,7 @@ class WorkoutVoiceCounter extends React.Component {
                     this.setState({
                         isIntervalEnd: true
                     });
+                    this._loadAndPlaySound(SOUND_URI_WORD["start"]);
                 }
                 if (timeMinute === 0 && timeSecond === 0) {
                     this.setState({
@@ -564,6 +643,15 @@ class WorkoutVoiceCounter extends React.Component {
                         nowIntervalSeconds: timeSecond,
                         nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
                     });
+                }
+                if (timeMinute === 1 && timeSecond === 0) {
+                    this._loadAndPlaySound(SOUND_URI_WORD["left1min"]);
+                } else if (timeMinute === 0 && timeSecond === 30) {
+                    this._loadAndPlaySound(SOUND_URI_WORD["left30sec"]);
+                } else if (timeMinute === 0 && timeSecond === 10) {
+                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(9)]);
+                } else if (timeMinute === 0 && timeSecond <= 5 && timeSecond > 0) {
+                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(timeSecond - 1)]);
                 }
             } else if (pauseFlg === true) {
                 autoCancelCount++;
