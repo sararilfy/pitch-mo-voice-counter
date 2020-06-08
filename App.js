@@ -3,7 +3,7 @@ import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} 
 import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
-import { Asset } from "expo-asset";
+import {Asset} from "expo-asset";
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -60,6 +60,7 @@ class NumPicker extends React.Component {
             selected: this.props.selected
         };
     }
+
     render() {
         let array = [];
         const
@@ -68,7 +69,7 @@ class NumPicker extends React.Component {
         for (let i = minNum; i <= maxNum; i++) {
             array.push(i);
         }
-        return(
+        return (
             <Picker
                 selectedValue={this.state.selected}
                 style={styles.pickerItem}
@@ -78,7 +79,7 @@ class NumPicker extends React.Component {
                 }
                 }>
                 {array.map((item) => {
-                    return (<Picker.Item key={item} label={item.toString()} value={item} />)
+                    return (<Picker.Item key={item} label={item.toString()} value={item}/>)
                 })}
             </Picker>
         );
@@ -201,7 +202,7 @@ function SecondaryButton(props) {
     }
 }
 
-function SetDisplayGroup (props) {
+function SetDisplayGroup(props) {
     return (
         <View style={styles.setDisplayPosition}>
             <Text style={styles.nowTime}>
@@ -215,7 +216,8 @@ function BackgroundCircle() {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280">
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke="#e6e6e6" fill="none" strokeLinecap={"round"} />
+                <Circle cx="140" cy="140" r="130" strokeWidth={14} stroke="#e6e6e6" fill="none"
+                        strokeLinecap={"round"}/>
             </Svg>
         </View>
     );
@@ -225,7 +227,8 @@ function CountCircle(props) {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280" style={styles.circleSvg}>
-                <Circle cx="140" cy="140" r="130" strokeWidth={14}  stroke={props.color} fill="none" strokeLinecap={"round"} strokeDasharray={props.stroke} />
+                <Circle cx="140" cy="140" r="130" strokeWidth={14} stroke={props.color} fill="none"
+                        strokeLinecap={"round"} strokeDasharray={props.stroke}/>
             </Svg>
         </View>
     );
@@ -246,7 +249,8 @@ function NowSecond(props) {
         );
     } else {
         return (
-            <Text style={styles.nowSecond}><Text style={styles.nowSecondStrong}>{props.countpitch}</Text>/{props.pitchSec}秒</Text>
+            <Text style={styles.nowSecond}><Text
+                style={styles.nowSecondStrong}>{props.countpitch}</Text>/{props.pitchSec}秒</Text>
         );
     }
 }
@@ -324,6 +328,7 @@ class WorkoutVoiceCounter extends React.Component {
             isLoaded: false
         };
     }
+
     componentDidMount() {
         this._retrieveData("@WorkoutVoiceCounterSuperStore:latestSettings").then(
             value => {
@@ -344,7 +349,7 @@ class WorkoutVoiceCounter extends React.Component {
             },
             error => {
                 this.setState({
-                isLoaded: true
+                    isLoaded: true
                 });
                 alert(error);
             }
@@ -357,15 +362,15 @@ class WorkoutVoiceCounter extends React.Component {
      * @returns {Promise<void>}
      * @private
      */
-     _loadAndPlaySound = async(soundLabel) => {
+    _loadAndPlaySound = async (soundLabel) => {
         if (this.playbackInstance != null) {
             await this.playbackInstance.unloadAsync();
             this.playbackInstance = null;
         }
         try {
-            const { sound: soundObject} = await Audio.Sound.createAsync(
+            const {sound: soundObject} = await Audio.Sound.createAsync(
                 {uri: soundLabel},
-                { shouldPlay: true }
+                {shouldPlay: true}
             );
             this.playbackInstance = soundObject;
             await this.playbackInstance.playAsync();
@@ -476,7 +481,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: nowTime,
             mainKeyColor: COLOR_MAIN
         });
-        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
+        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / (this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -513,7 +518,7 @@ class WorkoutVoiceCounter extends React.Component {
                                 isCountEnd: true,
                                 nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                             });
-                        } else if (this.state.nowSetCount < this.state.settingSet){
+                        } else if (this.state.nowSetCount < this.state.settingSet) {
                             if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
                                 this.setState({
                                     nowSetCount: Number(this.state.nowSetCount + 1)
@@ -600,7 +605,7 @@ class WorkoutVoiceCounter extends React.Component {
         let timeMinute = this.state.settingIntervalMinutes,
             timeSecond = this.state.settingIntervalSeconds,
             circleSize = CIRCLE_STROKE_SIZE_MAX;
-        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/Number(timeMinute * 60 + timeSecond));
+        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / Number(timeMinute * 60 + timeSecond));
         this.setState({
             nowStatus: "INTERVAL",
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
@@ -666,7 +671,7 @@ class WorkoutVoiceCounter extends React.Component {
      * Functions buttons
      */
     handlePrimaryButton = () => {
-        if (this.state.nowStatus === "SETTING"){
+        if (this.state.nowStatus === "SETTING") {
             this._prepareCount();
             let latestSettings = {
                 settingSet: this.state.settingSet,
@@ -687,17 +692,21 @@ class WorkoutVoiceCounter extends React.Component {
 
     render() {
         let view,
-        countView;
+            countView;
 
         switch (this.state.nowStatus) {
             case "PREPARE":
                 countView = <PrepareNumGroup count={this.state.nowPrepareCount}/>;
                 break;
             case "COUNTER":
-                countView =  <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch} counttime={this.state.nowTimeCount} countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
+                countView = <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}
+                                           counttime={this.state.nowTimeCount}
+                                           countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
                 break;
             case "INTERVAL":
-                countView = <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds} isIntervalEnd={this.state.isIntervalEnd}/>;
+                countView =
+                    <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds}
+                                      isIntervalEnd={this.state.isIntervalEnd}/>;
                 break;
             default:
         }
@@ -733,8 +742,12 @@ class WorkoutVoiceCounter extends React.Component {
                 <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
                     <SafeAreaView style={styles.container}>
                         {view}
-                        <PrimaryButton value={this.state.primaryButtonLabel} isDisabled={this.state.primaryButtonIsDisabled} color={this.state.mainKeyColor} onPress={this.handlePrimaryButton}/>
-                        <SecondaryButton value={this.state.secondaryButtonLabel} isDisabled={this.state.secondaryButtonIsDisabled} color={this.state.mainKeyColor} onPress={this.handleSecondaryButton} />
+                        <PrimaryButton value={this.state.primaryButtonLabel}
+                                       isDisabled={this.state.primaryButtonIsDisabled} color={this.state.mainKeyColor}
+                                       onPress={this.handlePrimaryButton}/>
+                        <SecondaryButton value={this.state.secondaryButtonLabel}
+                                         isDisabled={this.state.secondaryButtonIsDisabled}
+                                         color={this.state.mainKeyColor} onPress={this.handleSecondaryButton}/>
                     </SafeAreaView>
                 </View>
             );
@@ -822,7 +835,7 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     circleSvg: {
-        transform: [{ rotate: "-90deg" }]
+        transform: [{rotate: "-90deg"}]
     },
     setDisplayPosition: {
         position: "absolute",
