@@ -1,9 +1,9 @@
-import React from 'react';
-import {AsyncStorage, Image, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {Button} from 'react-native-elements';
-import Svg, {Circle} from 'react-native-svg';
-import {Audio} from 'expo-av';
-import { Asset } from 'expo-asset';
+import React from "react";
+import {AsyncStorage, Image, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from "react-native";
+import {Button} from "react-native-elements";
+import Svg, {Circle} from "react-native-svg";
+import {Audio} from "expo-av";
+import { Asset } from "expo-asset";
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -12,39 +12,39 @@ const
     CIRCLE_STROKE_COLOR_INTERVAL = "#4ac08d",
     CIRCLE_STROKE_SIZE_MAX = 813,
     AUTO_SWITCH_COUNT_MAX = 600,
-    soundPath = './assets/sounds/',
+    soundPath = "./assets/sounds/",
     SOUND_URI_NUMBER = [
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-ichi1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-ni1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-san1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-yon1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-go1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-roku1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-nana1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-hachi1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-kyuu1.mp3')).uri,
-        Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-zyuu1.mp3')).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-ichi1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-ni1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-san1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-yon1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-go1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-roku1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-nana1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-hachi1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-kyuu1.mp3")).uri,
+        Asset.fromModule(require(soundPath + "info-girl1_info-girl1-zyuu1.mp3")).uri,
     ],
     SOUND_URI_WORD = {
-        start: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-start1.mp3')).uri,
-        end: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-syuuryou1.mp3')).uri,
-        rest: Asset.fromModule(require(soundPath + 'kyuukei.mp3')).uri,
-        left1min: Asset.fromModule(require(soundPath + 'nokori-ichi-pun.mp3')).uri,
-        left30sec: Asset.fromModule(require(soundPath + 'nokori-sanzyuu-byou.mp3')).uri,
-        1: Asset.fromModule(require(soundPath + 'ichi-kai.mp3')).uri,
-        2: Asset.fromModule(require(soundPath + 'ni-kai.mp3')).uri,
-        3: Asset.fromModule(require(soundPath + 'san-kai.mp3')).uri,
-        4: Asset.fromModule(require(soundPath + 'yon-kai.mp3')).uri,
-        5: Asset.fromModule(require(soundPath + 'go-kai.mp3')).uri,
-        6: Asset.fromModule(require(soundPath + 'roku-kai.mp3')).uri,
-        7: Asset.fromModule(require(soundPath + 'nana-kai.mp3')).uri,
-        8: Asset.fromModule(require(soundPath + 'hachi-kai.mp3')).uri,
-        9: Asset.fromModule(require(soundPath + 'kyuu-kai.mp3')).uri,
-        10: Asset.fromModule(require(soundPath + 'zyu-kai.mp3')).uri,
-        20: Asset.fromModule(require(soundPath + 'nizyu-kai.mp3')).uri,
-        30: Asset.fromModule(require(soundPath + 'sanzyu-kai.mp3')).uri,
-        40: Asset.fromModule(require(soundPath + 'yonzyu-kai.mp3')).uri,
-        50: Asset.fromModule(require(soundPath + 'gozyu-kai.mp3')).uri
+        start: Asset.fromModule(require(soundPath + "info-girl1_info-girl1-start1.mp3")).uri,
+        end: Asset.fromModule(require(soundPath + "info-girl1_info-girl1-syuuryou1.mp3")).uri,
+        rest: Asset.fromModule(require(soundPath + "kyuukei.mp3")).uri,
+        left1min: Asset.fromModule(require(soundPath + "nokori-ichi-pun.mp3")).uri,
+        left30sec: Asset.fromModule(require(soundPath + "nokori-sanzyuu-byou.mp3")).uri,
+        1: Asset.fromModule(require(soundPath + "ichi-kai.mp3")).uri,
+        2: Asset.fromModule(require(soundPath + "ni-kai.mp3")).uri,
+        3: Asset.fromModule(require(soundPath + "san-kai.mp3")).uri,
+        4: Asset.fromModule(require(soundPath + "yon-kai.mp3")).uri,
+        5: Asset.fromModule(require(soundPath + "go-kai.mp3")).uri,
+        6: Asset.fromModule(require(soundPath + "roku-kai.mp3")).uri,
+        7: Asset.fromModule(require(soundPath + "nana-kai.mp3")).uri,
+        8: Asset.fromModule(require(soundPath + "hachi-kai.mp3")).uri,
+        9: Asset.fromModule(require(soundPath + "kyuu-kai.mp3")).uri,
+        10: Asset.fromModule(require(soundPath + "zyu-kai.mp3")).uri,
+        20: Asset.fromModule(require(soundPath + "nizyu-kai.mp3")).uri,
+        30: Asset.fromModule(require(soundPath + "sanzyu-kai.mp3")).uri,
+        40: Asset.fromModule(require(soundPath + "yonzyu-kai.mp3")).uri,
+        50: Asset.fromModule(require(soundPath + "gozyu-kai.mp3")).uri
     };
 
 
@@ -96,7 +96,7 @@ function PickerCardGroup(props) {
                         min={1}
                         max={50}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={'settingTime'}
+                        statename={"settingTime"}
                     />
                     <Text style={styles.pickerText}>回</Text>
                     <NumPicker
@@ -104,7 +104,7 @@ function PickerCardGroup(props) {
                         min={1}
                         max={10}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={'settingSet'}
+                        statename={"settingSet"}
                     />
                     <Text style={styles.pickerText}>セット</Text>
                 </View>
@@ -117,7 +117,7 @@ function PickerCardGroup(props) {
                         min={0}
                         max={9}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={'settingIntervalMinutes'}
+                        statename={"settingIntervalMinutes"}
                     />
                     <Text style={styles.pickerText}>分</Text>
                     <NumPicker
@@ -125,7 +125,7 @@ function PickerCardGroup(props) {
                         min={0}
                         max={59}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={'settingIntervalSeconds'}
+                        statename={"settingIntervalSeconds"}
                     />
                     <Text style={styles.pickerText}>秒</Text>
                 </View>
@@ -139,7 +139,7 @@ function PickerCardGroup(props) {
                         min={1}
                         max={10}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={'settingPitch'}
+                        statename={"settingPitch"}
                     />
                     <Text style={styles.pickerText}>秒かける</Text>
                 </View>
@@ -325,7 +325,7 @@ class WorkoutVoiceCounter extends React.Component {
         };
     }
     componentDidMount() {
-        this._retrieveData('@WorkoutVoiceCounterSuperStore:latestSettings').then(
+        this._retrieveData("@WorkoutVoiceCounterSuperStore:latestSettings").then(
             value => {
                 if (value !== undefined) {
                     this.setState({
@@ -370,7 +370,7 @@ class WorkoutVoiceCounter extends React.Component {
             this.playbackInstance = soundObject;
             await this.playbackInstance.playAsync();
         } catch (error) {
-            alert('An sound playing error occurred!');
+            alert("An sound playing error occurred!");
         }
     }
 
@@ -385,7 +385,7 @@ class WorkoutVoiceCounter extends React.Component {
         try {
             await AsyncStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
-            alert('Error saving data');
+            alert("Error saving data");
         }
     };
 
@@ -402,7 +402,7 @@ class WorkoutVoiceCounter extends React.Component {
                 return JSON.parse(value);
             }
         } catch (error) {
-            alert('Error retrieving data');
+            alert("Error retrieving data");
         }
     };
 
@@ -465,14 +465,14 @@ class WorkoutVoiceCounter extends React.Component {
      */
     _startCount = () => {
         let time = 0,
-            label = '',
+            label = "",
             nowTime = 0,
             flg = 0,
             circleSize = 0;
         this.setState({
             nowStatus: "COUNTER",
             nowPitchSecondCount: 0,
-            nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowTimeCount: nowTime,
             circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL
         });
@@ -490,7 +490,7 @@ class WorkoutVoiceCounter extends React.Component {
                     label = time;
                     this.setState({
                         nowPitchSecondCount: label,
-                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                        nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
                     this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
                 }
@@ -504,14 +504,14 @@ class WorkoutVoiceCounter extends React.Component {
                     if (nowTime >= this.state.settingTime) {
                         clearInterval(timerId);
                         if (this.state.nowSetCount === this.state.settingSet) {
-                            label = '終了';
+                            label = "終了";
                             this._loadAndPlaySound(SOUND_URI_WORD["end"]);
                             this.setState({
                                 secondaryButtonLabel: "ホームへ",
                                 primaryButtonIsDisabled: true,
                                 nowPitchSecondCount: label,
                                 isCountEnd: true,
-                                nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                                nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                             });
                         } else if (this.state.nowSetCount < this.state.settingSet){
                             if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
@@ -603,7 +603,7 @@ class WorkoutVoiceCounter extends React.Component {
         const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/Number(timeMinute * 60 + timeSecond));
         this.setState({
             nowStatus: "INTERVAL",
-            nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX),
+            nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowIntervalMinutes: timeMinute,
             nowIntervalSeconds: timeSecond,
             circleStrokeColor: CIRCLE_STROKE_COLOR_INTERVAL,
@@ -623,7 +623,7 @@ class WorkoutVoiceCounter extends React.Component {
                 if (timeMinute === 0 && timeSecond === 0) {
                     this.setState({
                         nowSetCount: Number(this.state.nowSetCount + 1),
-                        nowCircleStrokeDasharray: '0 ' + String(CIRCLE_STROKE_SIZE_MAX)
+                        nowCircleStrokeDasharray: "0 " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
                     clearInterval(timerId);
                     this._startCount();
@@ -634,14 +634,14 @@ class WorkoutVoiceCounter extends React.Component {
                     this.setState({
                         nowIntervalMinutes: timeMinute,
                         nowIntervalSeconds: timeSecond,
-                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                        nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
                 } else {
                     timeSecond--;
                     circleSize = circleSize - circleMoveSize;
                     this.setState({
                         nowIntervalSeconds: timeSecond,
-                        nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
+                        nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
                 }
                 if (timeMinute === 1 && timeSecond === 0) {
@@ -675,7 +675,7 @@ class WorkoutVoiceCounter extends React.Component {
                 settingIntervalSeconds: this.state.settingIntervalSeconds,
                 settingPitch: this.state.settingPitch
             }
-            this._storeData('@WorkoutVoiceCounterSuperStore:latestSettings', latestSettings);
+            this._storeData("@WorkoutVoiceCounterSuperStore:latestSettings", latestSettings);
         } else {
             this._handlePauseCount();
         }
@@ -724,7 +724,7 @@ class WorkoutVoiceCounter extends React.Component {
             return (
                 <View style={[styles.background, {backgroundColor: "#FFFFFF"}]}>
                     <SafeAreaView style={styles.container}>
-                        <View style={styles.loaderContainer}><Image style={styles.loader} source={require('./assets/img/loader.gif')}/></View>
+                        <View style={styles.loaderContainer}><Image style={styles.loader} source={require("./assets/img/loader.gif")}/></View>
                     </SafeAreaView>
                 </View>
             );
@@ -764,34 +764,34 @@ const styles = StyleSheet.create({
     },
     buttonPosition: {
         bottom: 70,
-        position: 'absolute',
+        position: "absolute",
         width: 150
     },
     buttonPrimary: {
-        right: '8%'
+        right: "8%"
     },
     buttonSecondary: {
-        left: '8%'
+        left: "8%"
     },
     settingWindowContainer: {
         flex: 1,
-        paddingLeft: '5%',
-        paddingRight: '5%',
+        paddingLeft: "5%",
+        paddingRight: "5%",
         paddingTop: 20
     },
     pickerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         height: 200,
-        width: '100%'
+        width: "100%"
     },
     pickerCard: {
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         borderRadius: 40,
         marginBottom: 15,
-        paddingLeft: '10%',
-        paddingRight: '10%',
+        paddingLeft: "10%",
+        paddingRight: "10%",
         paddingBottom: 32,
         paddingTop: 32,
     },
@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
     },
     pickerTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginBottom: 25,
     },
     pickerText: {
@@ -815,48 +815,48 @@ const styles = StyleSheet.create({
         width: 100
     },
     circlePosition: {
-        alignItems: 'center',
+        alignItems: "center",
         left: 0,
-        position: 'absolute',
+        position: "absolute",
         right: 0,
         top: 198,
-        width: '100%'
+        width: "100%"
     },
     circleSvg: {
         transform: [{ rotate: "-90deg" }]
     },
     setDisplayPosition: {
-        position: 'absolute',
+        position: "absolute",
         left: 0,
         right: 0,
         top: 120,
-        alignItems: 'center',
-        width: '100%'
+        alignItems: "center",
+        width: "100%"
     },
     nowTime: {
         fontSize: 32,
-        fontWeight: 'bold'
+        fontWeight: "bold"
     },
     numStrong: {
         fontSize: 44
     },
     countNumDisplay: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         height: 245,
         left: 0,
         top: 215,
-        position: 'absolute',
-        width: '100%'
+        position: "absolute",
+        width: "100%"
     },
     countNum: {
         fontSize: 26,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginBottom: 5
     },
     nowSecond: {
         fontSize: 22,
-        fontWeight: 'bold'
+        fontWeight: "bold"
     },
     nowSecondStrong: {
         fontSize: 80
@@ -866,15 +866,15 @@ const styles = StyleSheet.create({
     },
     intervalTitle: {
         fontSize: 18,
-        fontWeight: 'bold'
+        fontWeight: "bold"
     },
     intervalSecondStrong: {
         fontSize: 58
     },
     loaderContainer: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
+        alignItems: "center",
+        justifyContent: "center"
     },
     loader: {
         height: 50,
