@@ -499,16 +499,6 @@ class WorkoutVoiceCounter extends React.Component {
                     this.setState({
                         nowTimeCount: nowTime
                     });
-                    if (nowTime <= 10) {
-                        this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
-                    } else {
-                        let str = String(nowTime).substring(1);
-                        if (str === "0") {
-                            this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
-                        } else {
-                            this._loadAndPlaySound(SOUND_URI_WORD[str]);
-                        }
-                    }
                 }
                 if (flg > this.state.settingPitch) {
                     if (nowTime >= this.state.settingTime) {
@@ -532,6 +522,17 @@ class WorkoutVoiceCounter extends React.Component {
                             } else {
                                 this.countIntervalTime();
                                 this._loadAndPlaySound(SOUND_URI_WORD["rest"]);
+                            }
+                        }
+                    } else {
+                        if (nowTime <= 10) {
+                            this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                        } else {
+                            let str = String(nowTime).substring(1);
+                            if (str === "0") {
+                                this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                            } else {
+                                this._loadAndPlaySound(SOUND_URI_WORD[str]);
                             }
                         }
                     }
