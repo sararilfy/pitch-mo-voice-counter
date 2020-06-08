@@ -1,5 +1,5 @@
 import React from "react";
-import {AsyncStorage, Image, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from "react-native";
+import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from "react-native";
 import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
@@ -725,7 +725,7 @@ class WorkoutVoiceCounter extends React.Component {
             return (
                 <View style={[styles.background, {backgroundColor: "#FFFFFF"}]}>
                     <SafeAreaView style={styles.container}>
-                        <View style={styles.loaderContainer}><Image style={styles.loader} source={require("./assets/img/loader.gif")}/></View>
+                        <View style={styles.loaderContainer}><Text style={styles.loadText}>Loding...</Text></View>
                     </SafeAreaView>
                 </View>
             );
@@ -876,8 +876,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center"
     },
-    loader: {
-        height: 50,
-        width: 50
+    loadText: {
+        fontSize: 26
     }
 });
