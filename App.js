@@ -48,7 +48,6 @@ const
         50: Asset.fromModule(require(soundPath + "gozyu-kai.mp3")).uri
     };
 
-
 let
     pauseFlg = false,
     cancelFlg = false,
@@ -73,7 +72,7 @@ class NumPicker extends React.Component {
             <Picker
                 selectedValue={this.state.selected}
                 style={styles.pickerItem}
-                onValueChange={(itemValue, itemIndex) => {
+                onValueChange={(itemValue) => {
                     this.setState({selected: itemValue});
                     this.props.handleSetValue(this.props.statename, itemValue);
                 }
@@ -364,7 +363,7 @@ class WorkoutVoiceCounter extends React.Component {
             this.playbackInstance = null;
         }
         try {
-            const { sound: soundObject, status } = await Audio.Sound.createAsync(
+            const { sound: soundObject} = await Audio.Sound.createAsync(
                 {uri: soundLabel},
                 { shouldPlay: true }
             );
