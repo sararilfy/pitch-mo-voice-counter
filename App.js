@@ -28,6 +28,9 @@ const
     SOUND_URI_WORD = {
         start: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-start1.mp3')).uri,
         end: Asset.fromModule(require(soundPath + 'info-girl1_info-girl1-syuuryou1.mp3')).uri,
+        rest: Asset.fromModule(require(soundPath + 'kyuukei.mp3')).uri,
+        left1min: Asset.fromModule(require(soundPath + 'nokori-ichi-pun.mp3')).uri,
+        left30sec: Asset.fromModule(require(soundPath + 'nokori-sanzyuu-byou.mp3')).uri,
         1: Asset.fromModule(require(soundPath + 'ichi-kai.mp3')).uri,
         2: Asset.fromModule(require(soundPath + 'ni-kai.mp3')).uri,
         3: Asset.fromModule(require(soundPath + 'san-kai.mp3')).uri,
@@ -528,6 +531,7 @@ class WorkoutVoiceCounter extends React.Component {
                                 this.handleStartCount();
                             } else {
                                 this.countIntervalTime();
+                                this._loadAndPlaySound(SOUND_URI_WORD["rest"]);
                             }
                         }
                     }
@@ -613,6 +617,7 @@ class WorkoutVoiceCounter extends React.Component {
                     this.setState({
                         isIntervalEnd: true
                     });
+                    this._loadAndPlaySound(SOUND_URI_WORD["start"]);
                 }
                 if (timeMinute === 0 && timeSecond === 0) {
                     this.setState({
@@ -637,6 +642,15 @@ class WorkoutVoiceCounter extends React.Component {
                         nowIntervalSeconds: timeSecond,
                         nowCircleStrokeDasharray: String(circleSize) + ' ' + String(CIRCLE_STROKE_SIZE_MAX)
                     });
+                }
+                if (timeMinute === 1 && timeSecond === 0) {
+                    this._loadAndPlaySound(SOUND_URI_WORD["left1min"]);
+                } else if (timeMinute === 0 && timeSecond === 30) {
+                    this._loadAndPlaySound(SOUND_URI_WORD["left30sec"]);
+                } else if (timeMinute === 0 && timeSecond === 10) {
+                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(9)]);
+                } else if (timeMinute === 0 && timeSecond <= 5 && timeSecond > 0) {
+                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(timeSecond - 1)]);
                 }
             } else if (pauseFlg === true) {
                 autoCancelCount++;
