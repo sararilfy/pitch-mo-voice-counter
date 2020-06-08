@@ -8,10 +8,11 @@ import { Asset } from "expo-asset";
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
     BACKGROUND_COLOR_COUNT = "#ffffff",
-    CIRCLE_STROKE_COLOR_NORMAL = "#f87c54",
-    CIRCLE_STROKE_COLOR_INTERVAL = "#4ac08d",
+    COLOR_MAIN = "#f87c54",
+    COLOR_INTERVAL = "#4ac08d",
     CIRCLE_STROKE_SIZE_MAX = 813,
     AUTO_SWITCH_COUNT_MAX = 600,
+    COUNT_NUM_PREPARE = 5,
     soundPath = "./assets/sounds/",
     SOUND_URI_NUMBER = [
         Asset.fromModule(require(soundPath + "info-girl1_info-girl1-ichi1.mp3")).uri,
@@ -167,7 +168,7 @@ function PrimaryButton(props) {
                 <Button
                     title={props.value}
                     type="solid"
-                    buttonStyle={styles.button}
+                    buttonStyle={[styles.button, {backgroundColor: props.color}]}
                     onPress={props.onPress}
                 />
             </View>
@@ -193,7 +194,7 @@ function SecondaryButton(props) {
                 <Button
                     title={props.value}
                     type="solid"
-                    buttonStyle={styles.button}
+                    buttonStyle={[styles.button, {backgroundColor: props.color}]}
                     onPress={props.onPress}
                 />
             </View>
@@ -319,7 +320,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowSetCount: 1,
             nowIntervalMinutes: 0,
             nowIntervalSeconds: 0,
-            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
+            mainKeyColor: COLOR_MAIN,
             isCountEnd: false,
             isLoaded: false
         };
@@ -425,7 +426,7 @@ class WorkoutVoiceCounter extends React.Component {
             primaryButtonLabel: "一時停止",
             secondaryButtonIsDisabled: false
         });
-        let time = 5,
+        let time = COUNT_NUM_PREPARE,
             label = "";
         this._loadAndPlaySound(SOUND_URI_NUMBER[Number(4)]);
         const timerId = setInterval(() => {
@@ -474,7 +475,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowTimeCount: nowTime,
-            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL
+            mainKeyColor: COLOR_MAIN
         });
         const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX/(this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
@@ -587,7 +588,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
-            circleStrokeColor: CIRCLE_STROKE_COLOR_NORMAL,
+            mainKeyColor: COLOR_MAIN,
             isCountEnd: false,
             isIntervalEnd: false
         });
@@ -606,7 +607,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowIntervalMinutes: timeMinute,
             nowIntervalSeconds: timeSecond,
-            circleStrokeColor: CIRCLE_STROKE_COLOR_INTERVAL,
+            mainKeyColor: COLOR_INTERVAL,
             isIntervalEnd: false
         });
         const timerId = setInterval(() => {
@@ -715,7 +716,7 @@ class WorkoutVoiceCounter extends React.Component {
             view = <View>
                 <SetDisplayGroup countset={this.state.nowSetCount} totalSet={this.state.settingSet}/>
                 <BackgroundCircle/>
-                <CountCircle stroke={this.state.nowCircleStrokeDasharray} color={this.state.circleStrokeColor}/>
+                <CountCircle stroke={this.state.nowCircleStrokeDasharray} color={this.state.mainKeyColor}/>
                 {countView}
             </View>;
         }
@@ -733,8 +734,8 @@ class WorkoutVoiceCounter extends React.Component {
                 <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
                     <SafeAreaView style={styles.container}>
                         {view}
-                        <PrimaryButton value={this.state.primaryButtonLabel} isDisabled={this.state.primaryButtonIsDisabled} onPress={this.handlePrimaryButton}/>
-                        <SecondaryButton value={this.state.secondaryButtonLabel} isDisabled={this.state.secondaryButtonIsDisabled} onPress={this.handleSecondaryButton} />
+                        <PrimaryButton value={this.state.primaryButtonLabel} isDisabled={this.state.primaryButtonIsDisabled} color={this.state.mainKeyColor} onPress={this.handlePrimaryButton}/>
+                        <SecondaryButton value={this.state.secondaryButtonLabel} isDisabled={this.state.secondaryButtonIsDisabled} color={this.state.mainKeyColor} onPress={this.handleSecondaryButton} />
                     </SafeAreaView>
                 </View>
             );
@@ -756,7 +757,6 @@ const styles = StyleSheet.create({
         flex: 1
     },
     button: {
-        backgroundColor: CIRCLE_STROKE_COLOR_NORMAL,
         borderRadius: 150,
         paddingTop: 20,
         paddingBottom: 20,
