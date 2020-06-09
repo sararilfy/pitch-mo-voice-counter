@@ -258,8 +258,8 @@ function NowSecond(props) {
 function CountNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
-            <TimeDisplayGroup counttime={props.counttime} totalTime={props.totaltime}/>
-            <NowSecond countpitch={props.countpitch} pitchSec={props.totalpitch} isend={props.isend}/>
+            <TimeDisplayGroup counttime={props.countTime} totalTime={props.totalTime}/>
+            <NowSecond countpitch={props.countPitch} pitchSec={props.totalPitch} isend={props.isEnd}/>
         </View>
     );
 }
@@ -351,32 +351,41 @@ class WorkoutVoiceCounter extends React.Component {
                 this.setState({
                     isLoaded: true
                 });
-                alert(error);
             }
-        );
+        ).catch(() => {
+            alert("Error saving data");
+        });
     }
 
     /**
-     * Load a sound and play
-     * @param soundLabel
+     * Load a sound
+     * @param soundUri
      * @returns {Promise<void>}
      * @private
      */
-    _loadAndPlaySound = async (soundLabel) => {
+    _loadSound = async (soundUri) => {
         if (this.playbackInstance != null) {
             await this.playbackInstance.unloadAsync();
             this.playbackInstance = null;
         }
-        try {
-            const {sound: soundObject} = await Audio.Sound.createAsync(
-                {uri: soundLabel},
-                {shouldPlay: true}
-            );
-            this.playbackInstance = soundObject;
-            await this.playbackInstance.playAsync();
-        } catch (error) {
-            alert("An sound playing error occurred!");
-        }
+        const {sound: soundObject} = await Audio.Sound.createAsync(
+          {uri: soundUri},
+          {shouldPlay: true}
+        );
+        this.playbackInstance = soundObject;
+    }
+
+    /**
+     * Play a sound
+     * @param uri
+     * @private
+     */
+    _playSound = (uri) => {
+        this._loadSound(uri).then(() => {
+            this.playbackInstance.playAsync().catch(() => {
+                alert("An sound playing error occurred!");
+            });
+        });
     }
 
     /**
@@ -387,11 +396,7 @@ class WorkoutVoiceCounter extends React.Component {
      * @private
      */
     _storeData = async (key, value) => {
-        try {
-            await AsyncStorage.setItem(key, JSON.stringify(value));
-        } catch (error) {
-            alert("Error saving data");
-        }
+        await AsyncStorage.setItem(key, JSON.stringify(value));
     };
 
     /**
@@ -401,13 +406,9 @@ class WorkoutVoiceCounter extends React.Component {
      * @private
      */
     _retrieveData = async (key) => {
-        try {
-            const value = await AsyncStorage.getItem(key);
-            if (value !== null) {
-                return JSON.parse(value);
-            }
-        } catch (error) {
-            alert("Error retrieving data");
+        const value = await AsyncStorage.getItem(key);
+        if (value !== null) {
+            return JSON.parse(value);
         }
     };
 
@@ -432,7 +433,7 @@ class WorkoutVoiceCounter extends React.Component {
         });
         let time = COUNT_NUM_PREPARE,
             label = "";
-        this._loadAndPlaySound(SOUND_URI_NUMBER[Number(4)]);
+        this._playSound(SOUND_URI_NUMBER[Number(4)]);
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -442,14 +443,14 @@ class WorkoutVoiceCounter extends React.Component {
                 switch (time) {
                     case 0:
                         label = "スタート";
-                        this._loadAndPlaySound(SOUND_URI_WORD["start"]);
+                        this._playSound(SOUND_URI_WORD["start"]);
                         break;
                     case -1:
                         clearInterval(timerId);
-                        this._startCount();
+                        this._mainCount();
                         break;
                     default:
-                        this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
+                        this._playSound(SOUND_URI_NUMBER[Number(time - 1)]);
                         label = time;
                         break;
                 }
@@ -468,7 +469,7 @@ class WorkoutVoiceCounter extends React.Component {
     /**
      * Function counter
      */
-    _startCount = () => {
+    _mainCount = () => {
         let time = 0,
             label = "",
             nowTime = 0,
@@ -478,8 +479,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowStatus: "COUNTER",
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
-            nowTimeCount: nowTime,
-            mainKeyColor: COLOR_MAIN
+            nowTimeCount: nowTime
         });
         const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / (this.state.settingTime * this.state.settingPitch));
         const timerId = setInterval(() => {
@@ -497,7 +497,7 @@ class WorkoutVoiceCounter extends React.Component {
                         nowPitchSecondCount: label,
                         nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
-                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(time - 1)]);
+                    this._playSound(SOUND_URI_NUMBER[Number(time - 1)]);
                 }
                 if (flg === this.state.settingPitch) {
                     nowTime++;
@@ -510,7 +510,7 @@ class WorkoutVoiceCounter extends React.Component {
                         clearInterval(timerId);
                         if (this.state.nowSetCount === this.state.settingSet) {
                             label = "終了";
-                            this._loadAndPlaySound(SOUND_URI_WORD["end"]);
+                            this._playSound(SOUND_URI_WORD["end"]);
                             this.setState({
                                 secondaryButtonLabel: "ホームへ",
                                 primaryButtonIsDisabled: true,
@@ -523,21 +523,21 @@ class WorkoutVoiceCounter extends React.Component {
                                 this.setState({
                                     nowSetCount: Number(this.state.nowSetCount + 1)
                                 });
-                                this._startCount();
+                                this._mainCount();
                             } else {
                                 this._countIntervalTime();
-                                this._loadAndPlaySound(SOUND_URI_WORD["rest"]);
+                                this._playSound(SOUND_URI_WORD["rest"]);
                             }
                         }
                     } else {
                         if (nowTime <= 10) {
-                            this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                            this._playSound(SOUND_URI_WORD[nowTime]);
                         } else {
                             let str = String(nowTime).substring(1);
                             if (str === "0") {
-                                this._loadAndPlaySound(SOUND_URI_WORD[nowTime]);
+                                this._playSound(SOUND_URI_WORD[nowTime]);
                             } else {
-                                this._loadAndPlaySound(SOUND_URI_WORD[str]);
+                                this._playSound(SOUND_URI_WORD[str]);
                             }
                         }
                     }
@@ -621,9 +621,10 @@ class WorkoutVoiceCounter extends React.Component {
             } else if (pauseFlg === false) {
                 if (timeMinute === 0 && timeSecond === 1) {
                     this.setState({
-                        isIntervalEnd: true
+                        isIntervalEnd: true,
+                        mainKeyColor: COLOR_MAIN
                     });
-                    this._loadAndPlaySound(SOUND_URI_WORD["start"]);
+                    this._playSound(SOUND_URI_WORD["start"]);
                 }
                 if (timeMinute === 0 && timeSecond === 0) {
                     this.setState({
@@ -631,7 +632,7 @@ class WorkoutVoiceCounter extends React.Component {
                         nowCircleStrokeDasharray: "0 " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
                     clearInterval(timerId);
-                    this._startCount();
+                    this._mainCount();
                 } else if (timeMinute > 0 && timeSecond === 0) {
                     timeMinute--;
                     timeSecond = 59;
@@ -650,13 +651,13 @@ class WorkoutVoiceCounter extends React.Component {
                     });
                 }
                 if (timeMinute === 1 && timeSecond === 0) {
-                    this._loadAndPlaySound(SOUND_URI_WORD["left1min"]);
+                    this._playSound(SOUND_URI_WORD["left1min"]);
                 } else if (timeMinute === 0 && timeSecond === 30) {
-                    this._loadAndPlaySound(SOUND_URI_WORD["left30sec"]);
+                    this._playSound(SOUND_URI_WORD["left30sec"]);
                 } else if (timeMinute === 0 && timeSecond === 10) {
-                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(9)]);
+                    this._playSound(SOUND_URI_NUMBER[Number(9)]);
                 } else if (timeMinute === 0 && timeSecond <= 5 && timeSecond > 0) {
-                    this._loadAndPlaySound(SOUND_URI_NUMBER[Number(timeSecond - 1)]);
+                    this._playSound(SOUND_URI_NUMBER[Number(timeSecond - 1)]);
                 }
             } else if (pauseFlg === true) {
                 autoCancelCount++;
@@ -680,7 +681,9 @@ class WorkoutVoiceCounter extends React.Component {
                 settingIntervalSeconds: this.state.settingIntervalSeconds,
                 settingPitch: this.state.settingPitch
             }
-            this._storeData("@WorkoutVoiceCounterSuperStore:latestSettings", latestSettings);
+            this._storeData("@WorkoutVoiceCounterSuperStore:latestSettings", latestSettings).catch(() => {
+                alert("Error saving data");
+            });
         } else {
             this._handlePauseCount();
         }
@@ -699,9 +702,9 @@ class WorkoutVoiceCounter extends React.Component {
                 countView = <PrepareNumGroup count={this.state.nowPrepareCount}/>;
                 break;
             case "COUNTER":
-                countView = <CountNumGroup totaltime={this.state.settingTime} totalpitch={this.state.settingPitch}
-                                           counttime={this.state.nowTimeCount}
-                                           countpitch={this.state.nowPitchSecondCount} isend={this.state.isCountEnd}/>;
+                countView = <CountNumGroup totalTime={this.state.settingTime} totalPitch={this.state.settingPitch}
+                                           countTime={this.state.nowTimeCount}
+                                           countPitch={this.state.nowPitchSecondCount} isEnd={this.state.isCountEnd}/>;
                 break;
             case "INTERVAL":
                 countView =
@@ -733,7 +736,7 @@ class WorkoutVoiceCounter extends React.Component {
             return (
                 <View style={[styles.background, {backgroundColor: "#FFFFFF"}]}>
                     <SafeAreaView style={styles.container}>
-                        <View style={styles.loaderContainer}><Text style={styles.loadText}>Loding...</Text></View>
+                        <View style={styles.loaderContainer}><Text style={styles.loadText}>Loading...</Text></View>
                     </SafeAreaView>
                 </View>
             );
