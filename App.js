@@ -1,5 +1,5 @@
 import React from "react";
-import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View} from "react-native";
+import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, StatusBar} from "react-native";
 import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
@@ -332,6 +332,7 @@ class WorkoutVoiceCounter extends React.Component {
      */
     _loadSound = async (isNumber, soundLabel) => {
         if (this.playbackInstance != null) {
+            await this.playbackInstance.stopAsync();
             await this.playbackInstance.unloadAsync();
         } else {
             this.playbackInstance = new Audio.Sound();
@@ -452,15 +453,11 @@ class WorkoutVoiceCounter extends React.Component {
      * @private
      */
     _judgeTimesSound = (num) => {
-        if (num <= 10) {
+        let str = String(num).substring(1);
+        if (num <= 10 || (num > 10 && str === "0")) {
             this._playSound(false, Number(num));
         } else {
-            let str = String(num).substring(1);
-            if (str === "0") {
-                this._playSound(false, Number(num));
-            } else {
-                this._playSound(false, Number(str));
-            }
+            this._playSound(false, Number(str));
         }
     }
 
@@ -809,6 +806,7 @@ class WorkoutVoiceCounter extends React.Component {
         } else {
             return (
                 <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
+                    <StatusBar barStyle="dark-content"/>
                     <SafeAreaView style={styles.container}>
                         {view}
                         <PrimaryButton value={this.state.primaryButtonLabel}
@@ -900,7 +898,7 @@ const styles = StyleSheet.create({
         left: 0,
         position: "absolute",
         right: 0,
-        top: 198,
+        top: 158,
         width: "100%"
     },
     circleSvg: {
@@ -910,7 +908,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         left: 0,
         right: 0,
-        top: 120,
+        top: 80,
         alignItems: "center",
         width: "100%"
     },
@@ -926,7 +924,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         height: 245,
         left: 0,
-        top: 215,
+        top: 175,
         position: "absolute",
         width: "100%"
     },
