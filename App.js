@@ -3,6 +3,7 @@ import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, 
 import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
+import * as SplashScreen from 'expo-splash-screen';
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -291,36 +292,41 @@ class WorkoutVoiceCounter extends React.Component {
             nowIntervalSeconds: 0,
             mainKeyColor: COLOR_MAIN,
             isCountEnd: false,
-            isLoaded: false
+            isReady: false
         };
     }
 
     componentDidMount() {
+        this.showSplashScreen();
         this._retrieveData("@WorkoutVoiceCounterSuperStore:latestSettings").then(
             value => {
                 if (value !== undefined) {
                     this.setState({
-                        isLoaded: true,
                         settingTime: value.settingTime,
                         settingSet: value.settingSet,
                         settingPitch: value.settingPitch,
                         settingIntervalMinutes: value.settingIntervalMinutes,
                         settingIntervalSeconds: value.settingIntervalSeconds,
                     });
-                } else {
-                    this.setState({
-                        isLoaded: true
-                    });
                 }
-            },
-            error => {
-                this.setState({
-                    isLoaded: true
-                });
             }
         ).catch(() => {
             alert("Error saving data");
-        });
+        }).then(() => {
+            this.setState({
+                isReady: true
+            }, async () => {
+                await SplashScreen.hideAsync();
+            });
+        })
+    }
+
+    /**
+     * Makes the native splash screen stay visible until hideAsync is called.
+     * @returns {Promise<void>}
+     */
+    showSplashScreen = async () => {
+        await SplashScreen.preventAutoHideAsync();
     }
 
     /**
@@ -332,7 +338,6 @@ class WorkoutVoiceCounter extends React.Component {
      */
     _loadSound = async (isNumber, soundLabel) => {
         if (this.playbackInstance != null) {
-            await this.playbackInstance.stopAsync();
             await this.playbackInstance.unloadAsync();
         } else {
             this.playbackInstance = new Audio.Sound();
@@ -795,30 +800,20 @@ class WorkoutVoiceCounter extends React.Component {
             </View>;
         }
 
-        if (!this.state.isLoaded) {
-            return (
-                <View style={[styles.background, {backgroundColor: "#FFFFFF"}]}>
-                    <SafeAreaView style={styles.container}>
-                        <View style={styles.loaderContainer}><Text style={styles.loadText}>Loading...</Text></View>
-                    </SafeAreaView>
-                </View>
-            );
-        } else {
-            return (
-                <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
-                    <StatusBar barStyle="dark-content"/>
-                    <SafeAreaView style={styles.container}>
-                        {view}
-                        <PrimaryButton value={this.state.primaryButtonLabel}
-                                       isDisabled={this.state.primaryButtonIsDisabled} color={this.state.mainKeyColor}
-                                       onPress={this.handlePrimaryButton}/>
-                        <SecondaryButton value={this.state.secondaryButtonLabel}
-                                         isDisabled={this.state.secondaryButtonIsDisabled}
-                                         color={this.state.mainKeyColor} onPress={this.handleSecondaryButton}/>
-                    </SafeAreaView>
-                </View>
-            );
-        }
+        return (
+            <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
+                <StatusBar barStyle="dark-content"/>
+                <SafeAreaView style={styles.container}>
+                    {view}
+                    <PrimaryButton value={this.state.primaryButtonLabel}
+                                   isDisabled={this.state.primaryButtonIsDisabled} color={this.state.mainKeyColor}
+                                   onPress={this.handlePrimaryButton}/>
+                    <SecondaryButton value={this.state.secondaryButtonLabel}
+                                     isDisabled={this.state.secondaryButtonIsDisabled}
+                                     color={this.state.mainKeyColor} onPress={this.handleSecondaryButton}/>
+                </SafeAreaView>
+            </View>
+        );
     }
 }
 
@@ -949,13 +944,5 @@ const styles = StyleSheet.create({
     },
     intervalSecondStrong: {
         fontSize: 58
-    },
-    loaderContainer: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center"
-    },
-    loadText: {
-        fontSize: 26
     }
 });
