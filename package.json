@@ -16,7 +16,9 @@
     "react-native-elements": "^2.0.2",
     "react-native-svg": "^11.0.1",
     "react-native-web": "~0.12.3",
-    "expo-splash-screen": "^0.2.3"
+    "expo-splash-screen": "^0.2.3",
+    "expo-firebase-core": "~1.0.0",
+    "expo-firebase-analytics": "~2.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

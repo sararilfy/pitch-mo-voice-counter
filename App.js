@@ -3,7 +3,8 @@ import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, 
 import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
-import * as SplashScreen from 'expo-splash-screen';
+import * as SplashScreen from "expo-splash-screen";
+import * as Analytics from "expo-firebase-analytics";
 
 const
     BACKGROUND_COLOR_SETTING = "#f1f0f2",
@@ -296,37 +297,42 @@ class WorkoutVoiceCounter extends React.Component {
         };
     }
 
-    componentDidMount() {
-        this.showSplashScreen();
+    /**
+     * componentDidMount
+     * @returns {void}
+     */
+    async componentDidMount() {
+        try {
+            await SplashScreen.preventAutoHideAsync();
+        } catch (e) {
+            alert(e);
+        }
         this._retrieveData("@WorkoutVoiceCounterSuperStore:latestSettings").then(
-            value => {
-                if (value !== undefined) {
-                    this.setState({
-                        settingTime: value.settingTime,
-                        settingSet: value.settingSet,
-                        settingPitch: value.settingPitch,
-                        settingIntervalMinutes: value.settingIntervalMinutes,
-                        settingIntervalSeconds: value.settingIntervalSeconds,
-                    });
-                }
-            }
+          value => {
+              if (value !== undefined) {
+                  this.setState(
+                    (state, props) => {
+                        return {
+                            settingTime: value.settingTime,
+                            settingSet: value.settingSet,
+                            settingPitch: value.settingPitch,
+                            settingIntervalMinutes: value.settingIntervalMinutes,
+                            settingIntervalSeconds: value.settingIntervalSeconds,
+                        }
+                    },
+                    () => {
+                        this.setState({
+                            isReady: true
+                        }, async () => {
+                            await SplashScreen.hideAsync();
+                        });
+                    }
+                  );
+              }
+          }
         ).catch(() => {
             alert("Error saving data");
-        }).then(() => {
-            this.setState({
-                isReady: true
-            }, async () => {
-                await SplashScreen.hideAsync();
-            });
         })
-    }
-
-    /**
-     * Makes the native splash screen stay visible until hideAsync is called.
-     * @returns {Promise<void>}
-     */
-    showSplashScreen = async () => {
-        await SplashScreen.preventAutoHideAsync();
     }
 
     /**
@@ -345,34 +351,34 @@ class WorkoutVoiceCounter extends React.Component {
         if (isNumber) {
             switch (soundLabel) {
                 case 1:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-ichi1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-ichi1.mp3"));
                     break;
                 case 2:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-ni1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-ni1.mp3"));
                     break;
                 case 3:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-san1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-san1.mp3"));
                     break;
                 case 4:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-yon1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-yon1.mp3"));
                     break;
                 case 5:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-go1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-go1.mp3"));
                     break;
                 case 6:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-roku1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-roku1.mp3"));
                     break;
                 case 7:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-nana1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-nana1.mp3"));
                     break;
                 case 8:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-hachi1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-hachi1.mp3"));
                     break;
                 case 9:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-kyuu1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-kyuu1.mp3"));
                     break;
                 case 10:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'info-girl1_info-girl1-zyuu1.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "info-girl1_info-girl1-zyuu1.mp3"));
                     break;
             }
         } else {
@@ -393,46 +399,46 @@ class WorkoutVoiceCounter extends React.Component {
                     await this.playbackInstance.loadAsync(require(soundPath + "nokori-sanzyuu-byou.mp3"));
                     break;
                 case 1:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'ichi-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "ichi-kai.mp3"));
                     break;
                 case 2:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'ni-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "ni-kai.mp3"));
                     break;
                 case 3:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'san-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "san-kai.mp3"));
                     break;
                 case 4:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'yon-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "yon-kai.mp3"));
                     break;
                 case 5:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'go-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "go-kai.mp3"));
                     break;
                 case 6:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'roku-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "roku-kai.mp3"));
                     break;
                 case 7:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'nana-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "nana-kai.mp3"));
                     break;
                 case 8:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'hachi-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "hachi-kai.mp3"));
                     break;
                 case 9:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'kyuu-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "kyuu-kai.mp3"));
                     break;
                 case 10:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'zyu-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "zyu-kai.mp3"));
                     break;
                 case 20:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'nizyu-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "nizyu-kai.mp3"));
                     break;
                 case 30:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'sanzyu-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "sanzyu-kai.mp3"));
                     break;
                 case 40:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'yonzyu-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "yonzyu-kai.mp3"));
                     break;
                 case 50:
-                    await this.playbackInstance.loadAsync(require(soundPath + 'gozyu-kai.mp3'));
+                    await this.playbackInstance.loadAsync(require(soundPath + "gozyu-kai.mp3"));
                     break;
             }
         }
@@ -800,6 +806,9 @@ class WorkoutVoiceCounter extends React.Component {
             </View>;
         }
 
+        if (!this.state.isReady) {
+            return null;
+        }
         return (
             <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
                 <StatusBar barStyle="dark-content"/>
@@ -912,7 +921,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     numStrong: {
-        fontSize: 44
+        fontSize: 58
     },
     countNumDisplay: {
         alignItems: "center",
