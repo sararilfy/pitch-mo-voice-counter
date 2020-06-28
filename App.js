@@ -737,7 +737,9 @@ class WorkoutVoiceCounter extends React.Component {
                     if (circleMoveSizeFinal === 0) {
                         circleMoveSizeFinal = Math.ceil(circleSize / 10);
                     }
-                    circleSize = circleSize - circleMoveSizeFinal;
+                    if (timeSecond !== 1) {
+                        circleSize = circleSize - circleMoveSizeFinal;
+                    }
                     this.setState({
                         nowIntervalSeconds: timeSecond,
                         nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
@@ -909,7 +911,7 @@ const styles = StyleSheet.create({
         marginBottom: 150
     },
     pickerTitle: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: "bold",
         marginBottom: 25,
     },
