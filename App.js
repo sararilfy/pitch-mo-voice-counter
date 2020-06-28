@@ -1,3 +1,6 @@
+import Bugsnag from '@bugsnag/expo';
+Bugsnag.start();
+
 import React from "react";
 import {AsyncStorage, Picker, SafeAreaView, ScrollView, StyleSheet, Text, View, StatusBar} from "react-native";
 import {Button} from "react-native-elements";
@@ -19,6 +22,8 @@ const
 let
     pauseFlg = false,
     cancelFlg = false,
+    soundErrorNumFlg = false,
+    soundErrorTextFlg = false,
     autoCancelCount = 0;
 
 class NumPicker extends React.Component {
@@ -305,7 +310,7 @@ class WorkoutVoiceCounter extends React.Component {
         try {
             await SplashScreen.preventAutoHideAsync();
         } catch (e) {
-            alert(e);
+            Bugsnag.notify(e);
         }
         this._retrieveData("@WorkoutVoiceCounterSuperStore:latestSettings").then(
           value => {
@@ -331,7 +336,7 @@ class WorkoutVoiceCounter extends React.Component {
               }
           }
         ).catch(() => {
-            alert("Error saving data");
+            Bugsnag.notify("Error _retrieveData");
         })
     }
 
@@ -453,7 +458,13 @@ class WorkoutVoiceCounter extends React.Component {
     _playSound = (isNum, label) => {
         this._loadSound(isNum, label).then(() => {
             this.playbackInstance.playAsync().catch(() => {
-                alert("An sound playing error occurred!");
+                if (isNum && !soundErrorNumFlg) {
+                    soundErrorNumFlg = true;
+                    Bugsnag.notify(label);
+                } else if (!isNum && !soundErrorTextFlg) {
+                    soundErrorTextFlg = true;
+                    Bugsnag.notify(label);
+                }
             });
         });
     }
@@ -655,6 +666,8 @@ class WorkoutVoiceCounter extends React.Component {
             cancelFlg = true;
         }
         pauseFlg = false;
+        soundErrorNumFlg = false;
+        soundErrorTextFlg = false;
         autoCancelCount = 0;
         this.setState({
             nowStatus: "SETTING",
@@ -680,7 +693,8 @@ class WorkoutVoiceCounter extends React.Component {
     _countIntervalTime = () => {
         let timeMinute = this.state.settingIntervalMinutes,
             timeSecond = this.state.settingIntervalSeconds,
-            circleSize = CIRCLE_STROKE_SIZE_MAX;
+            circleSize = CIRCLE_STROKE_SIZE_MAX,
+            circleMoveSizeFinal = 0;
         const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / Number(timeMinute * 60 + timeSecond));
         this.setState({
             nowStatus: "INTERVAL",
@@ -715,6 +729,16 @@ class WorkoutVoiceCounter extends React.Component {
                     circleSize = circleSize - circleMoveSize;
                     this.setState({
                         nowIntervalMinutes: timeMinute,
+                        nowIntervalSeconds: timeSecond,
+                        nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
+                    });
+                } else if (timeMinute === 0 && timeSecond <= 10) {
+                    timeSecond--;
+                    if (circleMoveSizeFinal === 0) {
+                        circleMoveSizeFinal = Math.ceil(circleSize / 10);
+                    }
+                    circleSize = circleSize - circleMoveSizeFinal;
+                    this.setState({
                         nowIntervalSeconds: timeSecond,
                         nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
@@ -756,7 +780,7 @@ class WorkoutVoiceCounter extends React.Component {
                 settingPitch: this.state.settingPitch
             }
             this._storeData("@WorkoutVoiceCounterSuperStore:latestSettings", latestSettings).catch(() => {
-                alert("Error saving data");
+                Bugsnag.notify("Error _storeData");
             });
         } else {
             this._handlePauseCount();
