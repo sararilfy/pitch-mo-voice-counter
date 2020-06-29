@@ -19,7 +19,8 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
     "react-native-elements": "^2.0.2",
     "react-native-svg": "^11.0.1",
-    "react-native-web": "~0.12.3"
+    "react-native-web": "~0.12.3",
+    "react-native-appearance": "~0.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
