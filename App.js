@@ -7,8 +7,11 @@ import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
 import * as SplashScreen from "expo-splash-screen";
-import { Appearance, AppearanceProvider, useColorScheme } from 'react-native-appearance';
+import { Appearance, AppearanceProvider } from 'react-native-appearance';
+import * as FirebaseCore from 'expo-firebase-core';
 import * as Analytics from "expo-firebase-analytics";
+
+// alert(JSON.stringify(FirebaseCore.DEFAULT_APP_OPTIONS));
 
 const
     CIRCLE_STROKE_SIZE_MAX = 813,

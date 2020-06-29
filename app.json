@@ -22,7 +22,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "info.saralab.pitchMoVoiceCounter",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "extra": {
       "bugsnag": {
