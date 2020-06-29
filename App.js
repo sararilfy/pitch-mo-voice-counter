@@ -29,9 +29,10 @@ let
     backgroundColorSetting,
     backgroundColorCount,
     backgroundColorPickerCard,
-    ColorMain,
-    ColorInterval,
-    ColorBackgroundCircle;
+    colorMain,
+    colorInterval,
+    colorBackgroundCircle,
+    statusBarColor;
 
 let colorScheme = Appearance.getColorScheme();
 changeModeColor(colorScheme);
@@ -41,17 +42,19 @@ function changeModeColor() {
       backgroundColorSetting = "#1a2744";
       backgroundColorCount = "#1a2744";
       backgroundColorPickerCard = "#424e69";
-      ColorMain = "#fa8f6d";
-      ColorInterval = "#72C19f";
-      ColorBackgroundCircle = "#424e69";
+      colorMain = "#fa8f6d";
+      colorInterval = "#72C19f";
+      colorBackgroundCircle = "#424e69";
+      statusBarColor = "light";
   } else {
       textColor = "#000000";
       backgroundColorSetting = "#f1f0f2";
       backgroundColorCount = "#ffffff";
       backgroundColorPickerCard = "#ffffff";
-      ColorMain = "#f87c54";
-      ColorInterval = "#4ac08d";
-      ColorBackgroundCircle = "#e6e6e6";
+      colorMain = "#f87c54";
+      colorInterval = "#4ac08d";
+      colorBackgroundCircle = "#e6e6e6";
+      statusBarColor = "dark-content";
   }
 }
 
@@ -219,7 +222,7 @@ function BackgroundCircle() {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280">
-                <Circle cx="140" cy="140" r="130" strokeWidth={14} stroke={ColorBackgroundCircle} fill="none"
+                <Circle cx="140" cy="140" r="130" strokeWidth={14} stroke={colorBackgroundCircle} fill="none"
                         strokeLinecap={"round"}/>
             </Svg>
         </View>
@@ -326,7 +329,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowSetCount: 1,
             nowIntervalMinutes: 0,
             nowIntervalSeconds: 0,
-            mainKeyColor: ColorMain,
+            mainKeyColor: colorMain,
             isCountEnd: false,
             isReady: false
         };
@@ -711,7 +714,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
-            mainKeyColor: ColorMain,
+            mainKeyColor: colorMain,
             isCountEnd: false,
             isIntervalEnd: false
         });
@@ -731,7 +734,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowIntervalMinutes: timeMinute,
             nowIntervalSeconds: timeSecond,
-            mainKeyColor: ColorInterval,
+            mainKeyColor: colorInterval,
             isIntervalEnd: false
         });
         const timerId = setInterval(() => {
@@ -742,7 +745,7 @@ class WorkoutVoiceCounter extends React.Component {
                 if (timeMinute === 0 && timeSecond === 1) {
                     this.setState({
                         isIntervalEnd: true,
-                        mainKeyColor: ColorMain
+                        mainKeyColor: colorMain
                     });
                     this._playSound(false, "start");
                 }
@@ -869,7 +872,7 @@ class WorkoutVoiceCounter extends React.Component {
         }
         return (
             <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
-                <StatusBar barStyle="dark-content"/>
+                <StatusBar barStyle={statusBarColor}/>
                 <SafeAreaView style={styles.container}>
                     {view}
                     <PrimaryButton value={this.state.primaryButtonLabel}
