@@ -743,6 +743,7 @@ class WorkoutVoiceCounter extends React.Component {
                     });
                     this._playSound(false, "start");
                 }
+
                 if (timeMinute === 0 && timeSecond === 0) {
                     this.setState({
                         nowSetCount: Number(this.state.nowSetCount + 1),
@@ -750,35 +751,36 @@ class WorkoutVoiceCounter extends React.Component {
                     });
                     clearInterval(timerId);
                     this._mainCount();
-                } else if (timeMinute > 0 && timeSecond === 0) {
-                    timeMinute--;
-                    timeSecond = 59;
-                    circleSize = circleSize - circleMoveSize;
-                    this.setState({
-                        nowIntervalMinutes: timeMinute,
-                        nowIntervalSeconds: timeSecond,
-                        nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
-                    });
-                } else if (timeMinute === 0 && timeSecond <= 10) {
-                    timeSecond--;
-                    if (circleMoveSizeFinal === 0) {
-                        circleMoveSizeFinal = Math.ceil(circleSize / 10);
-                    }
-                    if (timeSecond !== 1) {
-                        circleSize = circleSize - circleMoveSizeFinal;
-                    }
-                    this.setState({
-                        nowIntervalSeconds: timeSecond,
-                        nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
-                    });
                 } else {
-                    timeSecond--;
-                    circleSize = circleSize - circleMoveSize;
+                    // Reduce minute
+                    if (timeMinute > 0 && timeSecond === 0) {
+                        timeMinute--;
+                        timeSecond = 59;
+                        this.setState({
+                          nowIntervalMinutes: timeMinute,
+                        });
+                    } else {
+                        timeSecond--;
+                    }
+
+                    // Decrease number of circles for 10 seconds
+                    if (timeMinute === 0 && timeSecond <= 10) {
+                        if (circleMoveSizeFinal === 0) {
+                          circleMoveSizeFinal = Math.ceil(circleSize / 10);
+                        }
+                        if (timeSecond !== 1) {
+                          circleSize = circleSize - circleMoveSizeFinal;
+                        }
+                    } else {
+                        circleSize = circleSize - circleMoveSize;
+                    }
+
                     this.setState({
                         nowIntervalSeconds: timeSecond,
                         nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                     });
                 }
+
                 if (timeMinute === 1 && timeSecond === 0) {
                     this._playSound(false, "left1min");
                 } else if (timeMinute === 0 && timeSecond === 30) {
