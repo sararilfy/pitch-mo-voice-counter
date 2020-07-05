@@ -17,7 +17,29 @@ const
     CIRCLE_STROKE_SIZE_MAX = 813,
     AUTO_SWITCH_COUNT_MAX = 600,
     COUNT_NUM_PREPARE = 5,
-    soundPath = "./assets/sounds/";
+    soundPath = "./assets/sounds/",
+    THEME_COLORS = {
+        light: {
+            textColor : "#000000",
+            backgroundColorSetting : "#f1f0f2",
+            backgroundColorCount : "#ffffff",
+            backgroundColorPickerCard : "#ffffff",
+            colorMain : "#f87c54",
+            colorInterval : "#4ac08d",
+            colorBackgroundCircle : "#e6e6e6",
+            statusBarColor : "dark-content"
+        },
+        dark: {
+            textColor : "#eeeeee",
+            backgroundColorSetting : "#1a2744",
+            backgroundColorCount : "#1a2744",
+            backgroundColorPickerCard : "#424e69",
+            colorMain : "#fa8f6d",
+            colorInterval : "#72C19f",
+            colorBackgroundCircle : "#424e69",
+            statusBarColor : "light"
+        },
+    };
 
 let
     pauseFlg = false,
@@ -25,38 +47,7 @@ let
     soundErrorNumFlg = false,
     soundErrorTextFlg = false,
     autoCancelCount = 0,
-    textColor,
-    backgroundColorSetting,
-    backgroundColorCount,
-    backgroundColorPickerCard,
-    colorMain,
-    colorInterval,
-    colorBackgroundCircle,
-    statusBarColor;
-
-let colorScheme = Appearance.getColorScheme();
-changeModeColor(colorScheme);
-function changeModeColor() {
-  if (colorScheme === "dark") {
-      textColor = "#eeeeee";
-      backgroundColorSetting = "#1a2744";
-      backgroundColorCount = "#1a2744";
-      backgroundColorPickerCard = "#424e69";
-      colorMain = "#fa8f6d";
-      colorInterval = "#72C19f";
-      colorBackgroundCircle = "#424e69";
-      statusBarColor = "light";
-  } else {
-      textColor = "#000000";
-      backgroundColorSetting = "#f1f0f2";
-      backgroundColorCount = "#ffffff";
-      backgroundColorPickerCard = "#ffffff";
-      colorMain = "#f87c54";
-      colorInterval = "#4ac08d";
-      colorBackgroundCircle = "#e6e6e6";
-      statusBarColor = "dark-content";
-  }
-}
+    colorScheme = Appearance.getColorScheme();
 
 class NumPicker extends React.Component {
     constructor(props) {
@@ -77,11 +68,11 @@ class NumPicker extends React.Component {
         return (
             <Picker
                 selectedValue={this.state.selected}
-                itemStyle={{color: textColor}}
+                itemStyle={{color: this.props.color}}
                 style={styles.pickerItem}
                 onValueChange={(itemValue) => {
                     this.setState({selected: itemValue});
-                    this.props.handleSetValue(this.props.statename, itemValue);
+                    this.props.handleSetValue(this.props.stateName, itemValue);
                 }
                 }>
                 {array.map((item) => {
@@ -95,60 +86,65 @@ class NumPicker extends React.Component {
 function PickerCardGroup(props) {
     return (
         <ScrollView style={styles.settingWindowContainer}>
-            <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
-                <Text style={styles.pickerTitle}>目標</Text>
+            <View style={[styles.pickerCard, styles.pickerCardMarginBottom, {backgroundColor: props.bgColor}]}>
+                <Text style={[styles.pickerTitle, {color: props.textColor}]}>目標</Text>
                 <View style={styles.pickerContainer}>
                     <NumPicker
                         selected={props.time}
                         min={1}
                         max={50}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={"settingTime"}
+                        stateName={"settingTime"}
+                        color={props.textColor}
                     />
-                    <Text style={styles.pickerText}>回</Text>
+                    <Text style={[styles.pickerText, {color: props.textColor}]}>回</Text>
                     <NumPicker
                         selected={props.set}
                         min={1}
                         max={10}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={"settingSet"}
+                        stateName={"settingSet"}
+                        color={props.textColor}
                     />
-                    <Text style={styles.pickerText}>セット</Text>
+                    <Text style={[styles.pickerText, {color: props.textColor}]}>セット</Text>
                 </View>
             </View>
-            <View style={[styles.pickerCard, styles.pickerCardMarginBottom]}>
-                <Text style={styles.pickerTitle}>インターバル</Text>
+            <View style={[styles.pickerCard, styles.pickerCardMarginBottom, {backgroundColor: props.bgColor}]}>
+                <Text style={[styles.pickerTitle, {color: props.textColor}]}>インターバル</Text>
                 <View style={styles.pickerContainer}>
                     <NumPicker
                         selected={props.intervalm}
                         min={0}
                         max={9}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={"settingIntervalMinutes"}
+                        stateName={"settingIntervalMinutes"}
+                        color={props.textColor}
                     />
-                    <Text style={styles.pickerText}>分</Text>
+                    <Text style={[styles.pickerText, {color: props.textColor}]}>分</Text>
                     <NumPicker
                         selected={props.intervals}
                         min={0}
                         max={59}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={"settingIntervalSeconds"}
+                        stateName={"settingIntervalSeconds"}
+                        color={props.textColor}
                     />
-                    <Text style={styles.pickerText}>秒</Text>
+                    <Text style={[styles.pickerText, {color: props.textColor}]}>秒</Text>
                 </View>
             </View>
-            <View style={[styles.pickerCard, styles.pickerCardMarginBottomLast]}>
-                <Text style={styles.pickerTitle}>間隔(ピッチ)</Text>
+            <View style={[styles.pickerCard, styles.pickerCardMarginBottomLast, {backgroundColor: props.bgColor}]}>
+                <Text style={[styles.pickerTitle, {color: props.textColor}]}>間隔(ピッチ)</Text>
                 <View style={styles.pickerContainer}>
-                    <Text style={styles.pickerText}>1回に</Text>
+                    <Text style={[styles.pickerText, {color: props.textColor}]}>1回に</Text>
                     <NumPicker
                         selected={props.pitch}
                         min={1}
                         max={10}
                         handleSetValue={(stateName, num) => props.handleSetValue(stateName, num)}
-                        statename={"settingPitch"}
+                        stateName={"settingPitch"}
+                        color={props.textColor}
                     />
-                    <Text style={styles.pickerText}>秒かける</Text>
+                    <Text style={[styles.pickerText, {color: props.textColor}]}>秒かける</Text>
                 </View>
             </View>
         </ScrollView>
@@ -211,19 +207,18 @@ function SecondaryButton(props) {
 function SetDisplayGroup(props) {
     return (
         <View style={styles.setDisplayPosition}>
-            <Text style={styles.nowTime}>
-                <Text style={styles.numStrong}>{props.countset}</Text>/{props.totalSet}セット
+            <Text style={[styles.nowTime, {color: props.textColor}]}>
+                <Text style={[styles.numStrong, {color: props.textColor}]}>{props.countset}</Text>/{props.totalSet}セット
             </Text>
         </View>
     );
 }
 
-function BackgroundCircle() {
+function BackgroundCircle(props) {
     return (
         <View style={styles.circlePosition}>
             <Svg height="280" width="280">
-                <Circle cx="140" cy="140" r="130" strokeWidth={14} stroke={colorBackgroundCircle} fill="none"
-                        strokeLinecap={"round"}/>
+                <Circle cx="140" cy="140" r="130" strokeWidth={14} stroke={props.circleColor} fill="none" strokeLinecap={"round"}/>
             </Svg>
         </View>
     );
@@ -242,8 +237,8 @@ function CountCircle(props) {
 
 function TimeDisplayGroup(props) {
     return (
-        <Text style={styles.countNum}>
-            <Text style={styles.numStrong}>{props.counttime}</Text>/{props.totalTime}回
+        <Text style={[styles.countNum, {color: props.textColor}]}>
+            <Text style={[styles.numStrong, {color: props.textColor}]}>{props.counttime}</Text>/{props.totalTime}回
         </Text>
     );
 }
@@ -251,12 +246,12 @@ function TimeDisplayGroup(props) {
 function NowSecond(props) {
     if (props.isend) {
         return (
-            <Text style={styles.nowSecond}><Text style={styles.endTextStrong}>{props.countpitch}</Text></Text>
+            <Text style={[styles.nowSecond, {color: props.textColor}]}><Text style={[styles.endTextStrong, {color: props.textColor}]}>{props.countpitch}</Text></Text>
         );
     } else {
         return (
-            <Text style={styles.nowSecond}><Text
-                style={styles.nowSecondStrong}>{props.countpitch}</Text>/{props.pitchSec}秒</Text>
+            <Text style={[styles.nowSecond, {color: props.textColor}]}><Text
+                style={[styles.nowSecondStrong, {color: props.textColor}]}>{props.countpitch}</Text>/{props.pitchSec}秒</Text>
         );
     }
 }
@@ -264,8 +259,8 @@ function NowSecond(props) {
 function CountNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
-            <TimeDisplayGroup counttime={props.countTime} totalTime={props.totalTime}/>
-            <NowSecond countpitch={props.countPitch} pitchSec={props.totalPitch} isend={props.isEnd}/>
+            <TimeDisplayGroup counttime={props.countTime} totalTime={props.totalTime} textColor={props.textColor}/>
+            <NowSecond countpitch={props.countPitch} pitchSec={props.totalPitch} isend={props.isEnd} textColor={props.textColor}/>
         </View>
     );
 }
@@ -274,18 +269,18 @@ function IntervalNumGroup(props) {
     if (props.isIntervalEnd) {
         return (
             <View style={styles.countNumDisplay}>
-                <Text style={styles.nowSecond}>
-                    <Text style={styles.intervalSecondStrong}>スタート</Text>
+                <Text style={[styles.nowSecond, {color: props.textColor}]}>
+                    <Text style={[styles.intervalSecondStrong, {color: props.textColor}]}>スタート</Text>
                 </Text>
             </View>
         );
     } else {
         return (
             <View style={styles.countNumDisplay}>
-                <Text style={styles.intervalTitle}>インターバル終了まで</Text>
-                <Text style={styles.nowSecond}>
-                    <Text style={styles.intervalSecondStrong}>{props.minutes}</Text>分
-                    <Text style={styles.intervalSecondStrong}>{props.seconds}</Text>秒
+                <Text style={[styles.intervalTitle, {color: props.textColor}]}>インターバル終了まで</Text>
+                <Text style={[styles.nowSecond, {color: props.textColor}]}>
+                    <Text style={[styles.intervalSecondStrong, {color: props.textColor}]}>{props.minutes}</Text>分
+                    <Text style={[styles.intervalSecondStrong, {color: props.textColor}]}>{props.seconds}</Text>秒
                 </Text>
             </View>
         );
@@ -295,8 +290,8 @@ function IntervalNumGroup(props) {
 function PrepareNumGroup(props) {
     return (
         <View style={styles.countNumDisplay}>
-            <Text style={styles.nowSecond}>
-                <Text style={styles.intervalSecondStrong}>{props.count}</Text>
+            <Text style={[styles.nowSecond, {color: props.textColor}]}>
+                <Text style={[styles.intervalSecondStrong, {color: props.textColor}]}>{props.count}</Text>
             </Text>
         </View>
     );
@@ -317,7 +312,7 @@ class WorkoutVoiceCounter extends React.Component {
             settingPitch: 1,
             settingIntervalMinutes: 0,
             settingIntervalSeconds: 0,
-            backgroundColor: backgroundColorSetting,
+            backgroundColor: THEME_COLORS[colorScheme].backgroundColorSetting,
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
@@ -329,9 +324,17 @@ class WorkoutVoiceCounter extends React.Component {
             nowSetCount: 1,
             nowIntervalMinutes: 0,
             nowIntervalSeconds: 0,
-            mainKeyColor: colorMain,
+            mainKeyColor: THEME_COLORS[colorScheme].colorMain,
             isCountEnd: false,
-            isReady: false
+            isReady: false,
+            textColor: THEME_COLORS[colorScheme].textColor,
+            backgroundColorSetting: THEME_COLORS[colorScheme].backgroundColorSetting,
+            backgroundColorCount: THEME_COLORS[colorScheme].backgroundColorCount,
+            backgroundColorPickerCard: THEME_COLORS[colorScheme].backgroundColorPickerCard,
+            colorMain: THEME_COLORS[colorScheme].colorMain,
+            colorInterval: THEME_COLORS[colorScheme].colorInterval,
+            colorBackgroundCircle: THEME_COLORS[colorScheme].colorBackgroundCircle,
+            statusBarColor: THEME_COLORS[colorScheme].statusBarColor
         };
     }
 
@@ -370,6 +373,18 @@ class WorkoutVoiceCounter extends React.Component {
           }
         ).catch(() => {
             Bugsnag.notify("Error _retrieveData");
+        });
+        Appearance.addChangeListener(({ colorScheme }) => {
+            this.setState({
+                textColor: THEME_COLORS[colorScheme].textColor,
+                backgroundColorSetting: THEME_COLORS[colorScheme].backgroundColorSetting,
+                backgroundColorCount: THEME_COLORS[colorScheme].backgroundColorCount,
+                backgroundColorPickerCard: THEME_COLORS[colorScheme].backgroundColorPickerCard,
+                colorMain: THEME_COLORS[colorScheme].colorMain,
+                colorInterval: THEME_COLORS[colorScheme].colorInterval,
+                colorBackgroundCircle: THEME_COLORS[colorScheme].colorBackgroundCircle,
+                statusBarColor: THEME_COLORS[colorScheme].statusBarColor
+            });
         });
     }
 
@@ -555,7 +570,7 @@ class WorkoutVoiceCounter extends React.Component {
     _prepareCount = () => {
         this.setState({
             nowStatus: "PREPARE",
-            backgroundColor: backgroundColorCount,
+            backgroundColor: this.state.backgroundColorCount,
             primaryButtonLabel: "一時停止",
             secondaryButtonIsDisabled: false
         });
@@ -704,7 +719,7 @@ class WorkoutVoiceCounter extends React.Component {
         autoCancelCount = 0;
         this.setState({
             nowStatus: "SETTING",
-            backgroundColor: backgroundColorSetting,
+            backgroundColor: this.state.backgroundColorSetting,
             nowPrepareCount: 5,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
@@ -714,7 +729,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowTimeCount: 0,
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: "0 " + " " + String(CIRCLE_STROKE_SIZE_MAX),
-            mainKeyColor: colorMain,
+            mainKeyColor: this.state.colorMain,
             isCountEnd: false,
             isIntervalEnd: false
         });
@@ -734,7 +749,7 @@ class WorkoutVoiceCounter extends React.Component {
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowIntervalMinutes: timeMinute,
             nowIntervalSeconds: timeSecond,
-            mainKeyColor: colorInterval,
+            mainKeyColor: this.state.colorInterval,
             isIntervalEnd: false
         });
         const timerId = setInterval(() => {
@@ -745,7 +760,7 @@ class WorkoutVoiceCounter extends React.Component {
                 if (timeMinute === 0 && timeSecond === 1) {
                     this.setState({
                         isIntervalEnd: true,
-                        mainKeyColor: colorMain
+                        mainKeyColor: this.state.colorMain
                     });
                     this._playSound(false, "start");
                 }
@@ -834,17 +849,17 @@ class WorkoutVoiceCounter extends React.Component {
 
         switch (this.state.nowStatus) {
             case "PREPARE":
-                countView = <PrepareNumGroup count={this.state.nowPrepareCount}/>;
+                countView = <PrepareNumGroup count={this.state.nowPrepareCount} textColor={this.state.textColor}/>;
                 break;
             case "COUNTER":
                 countView = <CountNumGroup totalTime={this.state.settingTime} totalPitch={this.state.settingPitch}
                                            countTime={this.state.nowTimeCount}
-                                           countPitch={this.state.nowPitchSecondCount} isEnd={this.state.isCountEnd}/>;
+                                           countPitch={this.state.nowPitchSecondCount} isEnd={this.state.isCountEnd} textColor={this.state.textColor}/>;
                 break;
             case "INTERVAL":
                 countView =
                     <IntervalNumGroup minutes={this.state.nowIntervalMinutes} seconds={this.state.nowIntervalSeconds}
-                                      isIntervalEnd={this.state.isIntervalEnd}/>;
+                                      isIntervalEnd={this.state.isIntervalEnd} textColor={this.state.textColor}/>;
                 break;
             default:
         }
@@ -857,11 +872,13 @@ class WorkoutVoiceCounter extends React.Component {
                 intervalm={this.state.settingIntervalMinutes}
                 intervals={this.state.settingIntervalSeconds}
                 handleSetValue={(stateName, num) => this.handleSetValue(stateName, num)}
+                bgColor={this.state.backgroundColorPickerCard}
+                textColor={this.state.textColor}
             />;
         } else {
             view = <View>
-                <SetDisplayGroup countset={this.state.nowSetCount} totalSet={this.state.settingSet}/>
-                <BackgroundCircle/>
+                <SetDisplayGroup countset={this.state.nowSetCount} totalSet={this.state.settingSet} textColor={this.state.textColor}/>
+                <BackgroundCircle circleColor={this.state.colorBackgroundCircle}/>
                 <CountCircle stroke={this.state.nowCircleStrokeDasharray} color={this.state.mainKeyColor}/>
                 {countView}
             </View>;
@@ -871,8 +888,8 @@ class WorkoutVoiceCounter extends React.Component {
             return null;
         }
         return (
-            <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
-                <StatusBar barStyle={statusBarColor}/>
+            <View style={[styles.background, {backgroundColor: this.state.backgroundColorSetting}]}>
+                <StatusBar barStyle={this.state.statusBarColor}/>
                 <SafeAreaView style={styles.container}>
                     {view}
                     <PrimaryButton value={this.state.primaryButtonLabel}
@@ -933,7 +950,6 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     pickerCard: {
-        backgroundColor: backgroundColorPickerCard,
         borderRadius: 40,
         marginBottom: 15,
         paddingLeft: "10%",
@@ -948,13 +964,11 @@ const styles = StyleSheet.create({
         marginBottom: 150
     },
     pickerTitle: {
-        color: textColor,
         fontSize: 22,
         fontWeight: "bold",
         marginBottom: 25,
     },
     pickerText: {
-        color: textColor,
         fontSize: 18,
         paddingLeft: 2,
         paddingRight: 2
@@ -982,12 +996,10 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     nowTime: {
-        color: textColor,
         fontSize: 32,
         fontWeight: "bold"
     },
     numStrong: {
-        color: textColor,
         fontSize: 58
     },
     countNumDisplay: {
@@ -1000,30 +1012,25 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     countNum: {
-        color: textColor,
         fontSize: 26,
         fontWeight: "bold",
         marginBottom: 5
     },
     nowSecond: {
-        color: textColor,
         fontSize: 22,
         fontWeight: "bold"
     },
     nowSecondStrong: {
-        color: textColor,
         fontSize: 80
     },
     endTextStrong: {
         fontSize: 62
     },
     intervalTitle: {
-        color: textColor,
         fontSize: 18,
         fontWeight: "bold"
     },
     intervalSecondStrong: {
-        color: textColor,
         fontSize: 58
     }
 });
