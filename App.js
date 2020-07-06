@@ -604,6 +604,10 @@ class WorkoutVoiceCounter extends React.Component {
                 autoCancelCount++;
                 if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
                     this.handleCancelCount();
+
+                    (async() => {
+                        await Analytics.logEvent('arrival_forced_termination');
+                    })();
                 }
             }
         }, 1000);
@@ -661,6 +665,10 @@ class WorkoutVoiceCounter extends React.Component {
                                 isCountEnd: true,
                                 nowCircleStrokeDasharray: String(CIRCLE_STROKE_SIZE_MAX) + " " + String(CIRCLE_STROKE_SIZE_MAX)
                             });
+
+                            (async() => {
+                                await Analytics.logEvent('arrival_finish');
+                            })();
                         } else if (this.state.nowSetCount < this.state.settingSet) {
                             if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
                                 this.setState({
@@ -683,6 +691,10 @@ class WorkoutVoiceCounter extends React.Component {
                 autoCancelCount++;
                 if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
                     this.handleCancelCount();
+
+                    (async() => {
+                        await Analytics.logEvent('arrival_forced_termination');
+                    })();
                 }
             }
         }, 1000);
@@ -733,6 +745,9 @@ class WorkoutVoiceCounter extends React.Component {
             isCountEnd: false,
             isIntervalEnd: false
         });
+        (async() => {
+            await Analytics.logEvent('click_cancel');
+        })();
     };
 
     /**
@@ -813,9 +828,17 @@ class WorkoutVoiceCounter extends React.Component {
                 autoCancelCount++;
                 if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
                     this.handleCancelCount();
+
+                    (async() => {
+                        await Analytics.logEvent('arrival_forced_termination');
+                    })();
                 }
             }
         }, 1000);
+
+        (async() => {
+            await Analytics.logEvent('arrival_interval');
+        })();
     }
 
     /**
@@ -834,8 +857,20 @@ class WorkoutVoiceCounter extends React.Component {
             this._storeData("@WorkoutVoiceCounterSuperStore:latestSettings", latestSettings).catch(() => {
                 Bugsnag.notify("Error _storeData");
             });
+            (async() => {
+                await Analytics.logEvent('click_start', {
+                    settingSet: this.state.settingSet,
+                    settingTime: this.state.settingTime,
+                    settingIntervalMinutes: this.state.settingIntervalMinutes,
+                    settingIntervalSeconds: this.state.settingIntervalSeconds,
+                    settingPitch: this.state.settingPitch
+                });
+            })();
         } else {
             this._handlePauseCount();
+            (async() => {
+                await Analytics.logEvent('click_pause');
+            })();
         }
     };
 
