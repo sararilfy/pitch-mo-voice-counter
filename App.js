@@ -12,6 +12,8 @@ import * as FirebaseCore from 'expo-firebase-core';
 import * as Analytics from "expo-firebase-analytics";
 
 // alert(JSON.stringify(FirebaseCore.DEFAULT_APP_OPTIONS));
+// Analytics.setDebugModeEnabled(true);
+
 
 const
     CIRCLE_STROKE_SIZE_MAX = 813,
@@ -303,7 +305,7 @@ class WorkoutVoiceCounter extends React.Component {
         this.handleSetValue = this.handleSetValue.bind(this);
         this.handlePrimaryButton = this.handlePrimaryButton.bind(this);
         this.handleSecondaryButton = this.handleSecondaryButton.bind(this);
-        this.handleCancelCount = this.handleCancelCount.bind(this);
+        this.cancelCount = this.cancelCount.bind(this);
         this.playbackInstance = null;
         this.state = {
             nowStatus: "SETTING",
@@ -603,7 +605,7 @@ class WorkoutVoiceCounter extends React.Component {
             } else if (pauseFlg === true) {
                 autoCancelCount++;
                 if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                    this.handleCancelCount();
+                    this.cancelCount();
 
                     (async() => {
                         await Analytics.logEvent('arrival_forced_termination');
@@ -690,7 +692,7 @@ class WorkoutVoiceCounter extends React.Component {
             } else if (pauseFlg === true) {
                 autoCancelCount++;
                 if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                    this.handleCancelCount();
+                    this.cancelCount();
 
                     (async() => {
                         await Analytics.logEvent('arrival_forced_termination');
@@ -703,7 +705,7 @@ class WorkoutVoiceCounter extends React.Component {
     /**
      * Function pause count
      */
-    _handlePauseCount = () => {
+    _pauseCount = () => {
         if (pauseFlg === false) {
             pauseFlg = true;
             this.setState({
@@ -721,7 +723,7 @@ class WorkoutVoiceCounter extends React.Component {
     /**
      * Function cancel count
      */
-    handleCancelCount = () => {
+    cancelCount = () => {
         if (this.state.isCountEnd === false) {
             cancelFlg = true;
         }
@@ -745,9 +747,6 @@ class WorkoutVoiceCounter extends React.Component {
             isCountEnd: false,
             isIntervalEnd: false
         });
-        (async() => {
-            await Analytics.logEvent('click_cancel');
-        })();
     };
 
     /**
@@ -800,7 +799,7 @@ class WorkoutVoiceCounter extends React.Component {
                     }
 
                     // Decrease number of circles for 10 seconds
-                    if (timeMinute === 0 && timeSecond <= 10) {
+                    if (timeMinute === 0 && timeSecond <= 10 && !(this.state.settingIntervalMinutes === 0 && this.state.settingIntervalMinutes <= 10)) {
                         if (circleMoveSizeFinal === 0) {
                           circleMoveSizeFinal = Math.ceil(circleSize / 10);
                         }
@@ -827,7 +826,7 @@ class WorkoutVoiceCounter extends React.Component {
             } else if (pauseFlg === true) {
                 autoCancelCount++;
                 if (autoCancelCount > AUTO_SWITCH_COUNT_MAX) {
-                    this.handleCancelCount();
+                    this.cancelCount();
 
                     (async() => {
                         await Analytics.logEvent('arrival_forced_termination');
@@ -867,7 +866,7 @@ class WorkoutVoiceCounter extends React.Component {
                 });
             })();
         } else {
-            this._handlePauseCount();
+            this._pauseCount();
             (async() => {
                 await Analytics.logEvent('click_pause');
             })();
@@ -875,7 +874,10 @@ class WorkoutVoiceCounter extends React.Component {
     };
 
     handleSecondaryButton = () => {
-        this.handleCancelCount();
+        this.cancelCount();
+        (async() => {
+            await Analytics.logEvent('click_cancel');
+        })();
     }
 
     render() {
@@ -923,7 +925,7 @@ class WorkoutVoiceCounter extends React.Component {
             return null;
         }
         return (
-            <View style={[styles.background, {backgroundColor: this.state.backgroundColorSetting}]}>
+            <View style={[styles.background, {backgroundColor: this.state.backgroundColor}]}>
                 <StatusBar barStyle={this.state.statusBarColor}/>
                 <SafeAreaView style={styles.container}>
                     {view}
