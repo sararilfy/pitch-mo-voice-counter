@@ -11,10 +11,6 @@ import { Appearance, AppearanceProvider } from 'react-native-appearance';
 import * as FirebaseCore from 'expo-firebase-core';
 import * as Analytics from "expo-firebase-analytics";
 
-// alert(JSON.stringify(FirebaseCore.DEFAULT_APP_OPTIONS));
-Analytics.setDebugModeEnabled(true);
-
-
 const
     CIRCLE_STROKE_SIZE_MAX = 813,
     AUTO_SWITCH_COUNT_MAX = 600,
