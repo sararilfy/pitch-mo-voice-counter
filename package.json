@@ -11,7 +11,7 @@
     "@bugsnag/expo": "^7.1.1",
     "expo": "~37.0.12",
     "expo-av": "~8.1.0",
-    "expo-firebase-analytics": "^2.1.2",
+    "expo-firebase-analytics": "^2.4.1",
     "expo-firebase-core": "~1.0.0",
     "expo-splash-screen": "^0.2.3",
     "react": "~16.13.1",

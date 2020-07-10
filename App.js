@@ -12,7 +12,7 @@ import * as FirebaseCore from 'expo-firebase-core';
 import * as Analytics from "expo-firebase-analytics";
 
 // alert(JSON.stringify(FirebaseCore.DEFAULT_APP_OPTIONS));
-// Analytics.setDebugModeEnabled(true);
+Analytics.setDebugModeEnabled(true);
 
 
 const
@@ -711,12 +711,22 @@ class WorkoutVoiceCounter extends React.Component {
             this.setState({
                 primaryButtonLabel: "再開"
             });
+            (async() => {
+                await Analytics.logEvent('click_pause', {
+                    nowStatus: this.state.nowStatus
+                });
+            })();
         } else {
             pauseFlg = false;
             this.setState({
                 primaryButtonLabel: "一時停止"
             });
             autoCancelCount = 0;
+            (async() => {
+                await Analytics.logEvent('click_restart', {
+                    nowStatus: this.state.nowStatus
+                });
+            })();
         }
     };
 
@@ -867,17 +877,22 @@ class WorkoutVoiceCounter extends React.Component {
             })();
         } else {
             this._pauseCount();
-            (async() => {
-                await Analytics.logEvent('click_pause');
-            })();
         }
     };
 
     handleSecondaryButton = () => {
         this.cancelCount();
-        (async() => {
-            await Analytics.logEvent('click_cancel');
-        })();
+        if (this.state.isCountEnd) {
+            (async() => {
+                await Analytics.logEvent('click_home');
+            })();
+        } else {
+            (async() => {
+                await Analytics.logEvent('click_cancel', {
+                    nowStatus: this.state.nowStatus
+                });
+            })();
+        }
     }
 
     render() {
