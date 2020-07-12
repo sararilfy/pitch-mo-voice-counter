@@ -619,7 +619,8 @@ class WorkoutVoiceCounter extends React.Component {
             label = "",
             nowTime = 0,
             flg = 0,
-            circleSize = 0;
+            circleSize = 0,
+            circleMoveSizeFinal = 0;
         this.setState({
             nowStatus: "COUNTER",
             nowPitchSecondCount: 0,
@@ -636,7 +637,17 @@ class WorkoutVoiceCounter extends React.Component {
                 time++;
                 flg++;
                 if (flg <= this.state.settingPitch) {
-                    circleSize = circleSize + circleMoveSize;
+
+                    // Increase the number of end
+                    if (nowTime >= Math.ceil(this.state.settingTime / 2) && (this.state.settingTime >= 10 && this.state.settingPitch >= 5)) {
+                        if (circleMoveSizeFinal === 0) {
+                            circleMoveSizeFinal = Math.floor((CIRCLE_STROKE_SIZE_MAX - circleSize) / ((this.state.settingTime - nowTime) * this.state.settingPitch));
+                        }
+                        circleSize = circleSize + circleMoveSizeFinal;
+                    } else {
+                        circleSize = circleSize + circleMoveSize;
+                    }
+
                     label = time;
                     this.setState({
                         nowPitchSecondCount: label,
@@ -863,13 +874,7 @@ class WorkoutVoiceCounter extends React.Component {
                 Bugsnag.notify("Error _storeData");
             });
             (async() => {
-                await Analytics.logEvent('click_start', {
-                    settingSet: this.state.settingSet,
-                    settingTime: this.state.settingTime,
-                    settingIntervalMinutes: this.state.settingIntervalMinutes,
-                    settingIntervalSeconds: this.state.settingIntervalSeconds,
-                    settingPitch: this.state.settingPitch
-                });
+                await Analytics.logEvent('click_start');
             })();
         } else {
             this._pauseCount();
