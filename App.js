@@ -18,7 +18,7 @@ const
     soundPath = "./assets/sounds/",
     THEME_COLORS = {
         light: {
-            textColor : "#000000",
+            textColor : "#333333",
             backgroundColorSetting : "#f1f0f2",
             backgroundColorCount : "#ffffff",
             backgroundColorPickerCard : "#ffffff",
@@ -28,7 +28,7 @@ const
             statusBarColor : "dark-content"
         },
         dark: {
-            textColor : "#eeeeee",
+            textColor : "#dddddd",
             backgroundColorSetting : "#1a2744",
             backgroundColorCount : "#1a2744",
             backgroundColorPickerCard : "#424e69",
@@ -311,7 +311,7 @@ class WorkoutVoiceCounter extends React.Component {
             settingIntervalMinutes: 0,
             settingIntervalSeconds: 0,
             backgroundColor: THEME_COLORS[colorScheme].backgroundColorSetting,
-            nowPrepareCount: 5,
+            nowPrepareCount: COUNT_NUM_PREPARE,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
             primaryButtonIsDisabled: false,
@@ -375,6 +375,7 @@ class WorkoutVoiceCounter extends React.Component {
         Appearance.addChangeListener(({ colorScheme }) => {
             this.setState({
                 textColor: THEME_COLORS[colorScheme].textColor,
+                backgroundColor: THEME_COLORS[colorScheme].backgroundColorSetting,
                 backgroundColorSetting: THEME_COLORS[colorScheme].backgroundColorSetting,
                 backgroundColorCount: THEME_COLORS[colorScheme].backgroundColorCount,
                 backgroundColorPickerCard: THEME_COLORS[colorScheme].backgroundColorPickerCard,
@@ -620,14 +621,17 @@ class WorkoutVoiceCounter extends React.Component {
             nowTime = 0,
             flg = 0,
             circleSize = 0,
-            circleMoveSizeFinal = 0;
+            circleMoveSizeFinal = 0,
+            settingTime = this.state.settingTime,
+            settingPitch = this.state.settingPitch,
+            settingSet = this.state.settingSet;
         this.setState({
             nowStatus: "COUNTER",
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowTimeCount: nowTime
         });
-        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / (this.state.settingTime * this.state.settingPitch));
+        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / (settingTime * settingPitch));
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -636,12 +640,12 @@ class WorkoutVoiceCounter extends React.Component {
             } else if (pauseFlg === false) {
                 time++;
                 flg++;
-                if (flg <= this.state.settingPitch) {
+                if (flg <= settingPitch) {
 
                     // Increase the number of end
-                    if (nowTime >= Math.ceil(this.state.settingTime / 2) && (this.state.settingTime >= 10 && this.state.settingPitch >= 5)) {
+                    if (nowTime >= Math.ceil(settingTime / 2) && (settingTime >= 10 && settingPitch >= 5)) {
                         if (circleMoveSizeFinal === 0) {
-                            circleMoveSizeFinal = Math.floor((CIRCLE_STROKE_SIZE_MAX - circleSize) / ((this.state.settingTime - nowTime) * this.state.settingPitch));
+                            circleMoveSizeFinal = Math.floor((CIRCLE_STROKE_SIZE_MAX - circleSize) / ((settingTime - nowTime) * settingPitch));
                         }
                         circleSize = circleSize + circleMoveSizeFinal;
                     } else {
@@ -655,16 +659,16 @@ class WorkoutVoiceCounter extends React.Component {
                     });
                     this._playSound(true, Number(time));
                 }
-                if (flg === this.state.settingPitch) {
+                if (flg === settingPitch) {
                     nowTime++;
                     this.setState({
                         nowTimeCount: nowTime
                     });
                 }
-                if (flg > this.state.settingPitch) {
-                    if (nowTime >= this.state.settingTime) {
+                if (flg > settingPitch) {
+                    if (nowTime >= settingTime) {
                         clearInterval(timerId);
-                        if (this.state.nowSetCount === this.state.settingSet) {
+                        if (this.state.nowSetCount === settingSet) {
                             label = "終了";
                             this._playSound(false, "end");
                             this.setState({
@@ -678,7 +682,7 @@ class WorkoutVoiceCounter extends React.Component {
                             (async() => {
                                 await Analytics.logEvent('arrival_finish');
                             })();
-                        } else if (this.state.nowSetCount < this.state.settingSet) {
+                        } else if (this.state.nowSetCount < settingSet) {
                             if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
                                 this.setState({
                                     nowSetCount: Number(this.state.nowSetCount + 1)
@@ -751,7 +755,7 @@ class WorkoutVoiceCounter extends React.Component {
         this.setState({
             nowStatus: "SETTING",
             backgroundColor: this.state.backgroundColorSetting,
-            nowPrepareCount: 5,
+            nowPrepareCount: COUNT_NUM_PREPARE,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
             primaryButtonIsDisabled: false,
