@@ -45,7 +45,8 @@ let
     soundErrorNumFlg = false,
     soundErrorTextFlg = false,
     autoCancelCount = 0,
-    colorScheme = Appearance.getColorScheme();
+    colorSchemeName = Appearance.getColorScheme(),
+    colorChangeFlg = false;
 
 class NumPicker extends React.Component {
     constructor(props) {
@@ -310,7 +311,7 @@ class WorkoutVoiceCounter extends React.Component {
             settingPitch: 1,
             settingIntervalMinutes: 0,
             settingIntervalSeconds: 0,
-            backgroundColor: THEME_COLORS[colorScheme].backgroundColorSetting,
+            backgroundColor: THEME_COLORS[colorSchemeName].backgroundColorSetting,
             nowPrepareCount: COUNT_NUM_PREPARE,
             primaryButtonLabel: "スタート",
             secondaryButtonLabel: "キャンセル",
@@ -322,17 +323,17 @@ class WorkoutVoiceCounter extends React.Component {
             nowSetCount: 1,
             nowIntervalMinutes: 0,
             nowIntervalSeconds: 0,
-            mainKeyColor: THEME_COLORS[colorScheme].colorMain,
+            mainKeyColor: THEME_COLORS[colorSchemeName].colorMain,
             isCountEnd: false,
             isReady: false,
-            textColor: THEME_COLORS[colorScheme].textColor,
-            backgroundColorSetting: THEME_COLORS[colorScheme].backgroundColorSetting,
-            backgroundColorCount: THEME_COLORS[colorScheme].backgroundColorCount,
-            backgroundColorPickerCard: THEME_COLORS[colorScheme].backgroundColorPickerCard,
-            colorMain: THEME_COLORS[colorScheme].colorMain,
-            colorInterval: THEME_COLORS[colorScheme].colorInterval,
-            colorBackgroundCircle: THEME_COLORS[colorScheme].colorBackgroundCircle,
-            statusBarColor: THEME_COLORS[colorScheme].statusBarColor
+            textColor: THEME_COLORS[colorSchemeName].textColor,
+            backgroundColorSetting: THEME_COLORS[colorSchemeName].backgroundColorSetting,
+            backgroundColorCount: THEME_COLORS[colorSchemeName].backgroundColorCount,
+            backgroundColorPickerCard: THEME_COLORS[colorSchemeName].backgroundColorPickerCard,
+            colorMain: THEME_COLORS[colorSchemeName].colorMain,
+            colorInterval: THEME_COLORS[colorSchemeName].colorInterval,
+            colorBackgroundCircle: THEME_COLORS[colorSchemeName].colorBackgroundCircle,
+            statusBarColor: THEME_COLORS[colorSchemeName].statusBarColor
         };
     }
 
@@ -372,18 +373,14 @@ class WorkoutVoiceCounter extends React.Component {
         ).catch(() => {
             Bugsnag.notify("Error _retrieveData");
         });
+
         Appearance.addChangeListener(({ colorScheme }) => {
-            this.setState({
-                textColor: THEME_COLORS[colorScheme].textColor,
-                backgroundColor: THEME_COLORS[colorScheme].backgroundColorSetting,
-                backgroundColorSetting: THEME_COLORS[colorScheme].backgroundColorSetting,
-                backgroundColorCount: THEME_COLORS[colorScheme].backgroundColorCount,
-                backgroundColorPickerCard: THEME_COLORS[colorScheme].backgroundColorPickerCard,
-                colorMain: THEME_COLORS[colorScheme].colorMain,
-                colorInterval: THEME_COLORS[colorScheme].colorInterval,
-                colorBackgroundCircle: THEME_COLORS[colorScheme].colorBackgroundCircle,
-                statusBarColor: THEME_COLORS[colorScheme].statusBarColor
-            });
+            colorSchemeName = colorScheme;
+            if (this.state.nowStatus === "SETTING" || this.state.isCountEnd) {
+                this._setModeColor(colorScheme);
+            } else {
+                colorChangeFlg = true;
+            }
         });
     }
 
@@ -561,6 +558,25 @@ class WorkoutVoiceCounter extends React.Component {
      */
     handleSetValue = (stateName, num) => {
         this.setState({[stateName]: num});
+    }
+
+    /**
+     * Function set mode color
+     * @param colorScheme
+     * @private
+     */
+    _setModeColor = (colorScheme) => {
+        this.setState({
+            textColor: THEME_COLORS[colorScheme].textColor,
+            backgroundColor: THEME_COLORS[colorScheme].backgroundColorSetting,
+            backgroundColorSetting: THEME_COLORS[colorScheme].backgroundColorSetting,
+            backgroundColorCount: THEME_COLORS[colorScheme].backgroundColorCount,
+            backgroundColorPickerCard: THEME_COLORS[colorScheme].backgroundColorPickerCard,
+            colorMain: THEME_COLORS[colorScheme].colorMain,
+            colorInterval: THEME_COLORS[colorScheme].colorInterval,
+            colorBackgroundCircle: THEME_COLORS[colorScheme].colorBackgroundCircle,
+            statusBarColor: THEME_COLORS[colorScheme].statusBarColor
+        });
     }
 
     /**
@@ -768,6 +784,11 @@ class WorkoutVoiceCounter extends React.Component {
             isCountEnd: false,
             isIntervalEnd: false
         });
+
+        if (colorChangeFlg) {
+            this._setModeColor(colorSchemeName);
+            colorChangeFlg = false;
+        }
     };
 
     /**
