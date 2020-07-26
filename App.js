@@ -637,17 +637,18 @@ class WorkoutVoiceCounter extends React.Component {
             nowTime = 0,
             flg = 0,
             circleSize = 0,
-            circleMoveSizeFinal = 0,
+            nowSecond = 0,
+            nowPercentage = 0,
             settingTime = this.state.settingTime,
             settingPitch = this.state.settingPitch,
-            settingSet = this.state.settingSet;
+            settingSet = this.state.settingSet,
+            maxSeconds = settingTime * settingPitch;
         this.setState({
             nowStatus: "COUNTER",
             nowPitchSecondCount: 0,
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
             nowTimeCount: nowTime
         });
-        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / (settingTime * settingPitch));
         const timerId = setInterval(() => {
             if (cancelFlg === true) {
                 clearInterval(timerId);
@@ -657,17 +658,9 @@ class WorkoutVoiceCounter extends React.Component {
                 time++;
                 flg++;
                 if (flg <= settingPitch) {
-
-                    // Increase the number of end
-                    if (nowTime >= Math.ceil(settingTime / 2) && (settingTime >= 10 && settingPitch >= 5)) {
-                        if (circleMoveSizeFinal === 0) {
-                            circleMoveSizeFinal = Math.floor((CIRCLE_STROKE_SIZE_MAX - circleSize) / ((settingTime - nowTime) * settingPitch));
-                        }
-                        circleSize = circleSize + circleMoveSizeFinal;
-                    } else {
-                        circleSize = circleSize + circleMoveSize;
-                    }
-
+                    nowSecond++;
+                    nowPercentage = Math.floor(nowSecond / maxSeconds * 100);
+                    circleSize = Math.floor(CIRCLE_STROKE_SIZE_MAX * nowPercentage / 100);
                     label = time;
                     this.setState({
                         nowPitchSecondCount: label,
@@ -798,8 +791,9 @@ class WorkoutVoiceCounter extends React.Component {
         let timeMinute = this.state.settingIntervalMinutes,
             timeSecond = this.state.settingIntervalSeconds,
             circleSize = CIRCLE_STROKE_SIZE_MAX,
-            circleMoveSizeFinal = 0;
-        const circleMoveSize = Math.floor(CIRCLE_STROKE_SIZE_MAX / Number(timeMinute * 60 + timeSecond));
+            nowSecond = 0,
+            nowPercentage = 0,
+            maxSeconds = this.state.settingIntervalMinutes * 60 + this.state.settingIntervalSeconds;
         this.setState({
             nowStatus: "INTERVAL",
             nowCircleStrokeDasharray: String(circleSize) + " " + String(CIRCLE_STROKE_SIZE_MAX),
@@ -840,17 +834,9 @@ class WorkoutVoiceCounter extends React.Component {
                         timeSecond--;
                     }
 
-                    // Decrease number of circles for 10 seconds
-                    if (timeMinute === 0 && timeSecond <= 10 && !(this.state.settingIntervalMinutes === 0 && this.state.settingIntervalMinutes <= 10)) {
-                        if (circleMoveSizeFinal === 0) {
-                          circleMoveSizeFinal = Math.ceil(circleSize / 10);
-                        }
-                        if (timeSecond !== 1) {
-                          circleSize = circleSize - circleMoveSizeFinal;
-                        }
-                    } else {
-                        circleSize = circleSize - circleMoveSize;
-                    }
+                    nowSecond++;
+                    nowPercentage = 100 - Math.floor(nowSecond / maxSeconds * 100);
+                    circleSize = Math.floor(CIRCLE_STROKE_SIZE_MAX * nowPercentage / 100);
 
                     this.setState({
                         nowIntervalSeconds: timeSecond,
