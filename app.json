@@ -12,8 +12,8 @@
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
+      "backgroundColor": "#f87c54"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -22,7 +22,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
-    }
+      "supportsTablet": true,
+      "bundleIdentifier": "info.saralab.pitchMoVoiceCounter",
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "extra": {
+      "bugsnag": {
+        "apiKey": "bddd70753e3d10bfed9941033f308e04"
+      }
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "@bugsnag/expo/hooks/post-publish.js",
+          "config": {}
+        }
+      ]
+    },
+    "userInterfaceStyle": "automatic"
   }
 }
