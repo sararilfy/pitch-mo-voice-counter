@@ -987,12 +987,12 @@ const styles = StyleSheet.create({
         borderRadius: 150,
         paddingTop: 20,
         paddingBottom: 20,
-        width: 150
+        width: 136
     },
     buttonPosition: {
         bottom: 70,
         position: "absolute",
-        width: 150
+        width: 136
     },
     buttonPrimary: {
         right: "8%"
@@ -1025,7 +1025,7 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
     pickerCardMarginBottomLast: {
-        marginBottom: 150
+        marginBottom: 170
     },
     pickerTitle: {
         fontSize: 22,
