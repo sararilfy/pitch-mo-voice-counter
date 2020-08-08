@@ -158,7 +158,7 @@ function PrimaryButton(props) {
                     title={props.value}
                     type="solid"
                     disabled
-                    buttonStyle={styles.button}
+                    buttonStyle={[styles.button, styles.buttonDisabled]}
                     onPress={props.onPress}
                 />
             </View>
@@ -185,7 +185,7 @@ function SecondaryButton(props) {
                     title={props.value}
                     type="solid"
                     disabled
-                    buttonStyle={styles.button}
+                    buttonStyle={[styles.button, styles.buttonDisabled]}
                 />
             </View>
         );
@@ -988,6 +988,9 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 20,
         width: 136
+    },
+    buttonDisabled: {
+        opacity: .5
     },
     buttonPosition: {
         bottom: 70,
