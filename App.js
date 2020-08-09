@@ -1,4 +1,4 @@
-import Bugsnag from '@bugsnag/expo';
+import Bugsnag from "@bugsnag/expo";
 Bugsnag.start();
 
 import React from "react";
@@ -7,8 +7,8 @@ import {Button} from "react-native-elements";
 import Svg, {Circle} from "react-native-svg";
 import {Audio} from "expo-av";
 import * as SplashScreen from "expo-splash-screen";
-import { Appearance, AppearanceProvider } from 'react-native-appearance';
-import * as FirebaseCore from 'expo-firebase-core';
+import { Appearance, AppearanceProvider } from "react-native-appearance";
+import * as FirebaseCore from "expo-firebase-core";
 import * as Analytics from "expo-firebase-analytics";
 
 const
@@ -47,6 +47,10 @@ let
     autoCancelCount = 0,
     colorSchemeName = Appearance.getColorScheme(),
     colorChangeFlg = false;
+
+if (colorSchemeName !== "light" || colorSchemeName !== "dark") {
+    colorSchemeName = "light"
+}
 
 class NumPicker extends React.Component {
     constructor(props) {
@@ -349,7 +353,7 @@ class WorkoutVoiceCounter extends React.Component {
         }
         this._retrieveData("@WorkoutVoiceCounterSuperStore:latestSettings").then(
           value => {
-              if (value !== undefined) {
+              if (value !== undefined && value !== null) {
                   this.setState(
                     (state, props) => {
                         return {
@@ -368,6 +372,12 @@ class WorkoutVoiceCounter extends React.Component {
                         });
                     }
                   );
+              } else {
+                  this.setState({
+                      isReady: true
+                  }, async () => {
+                      await SplashScreen.hideAsync();
+                  });
               }
           }
         ).catch(() => {
@@ -541,13 +551,15 @@ class WorkoutVoiceCounter extends React.Component {
     /**
      * Function get data
      * @param key
-     * @returns {Promise<void>}
+     * @returns {Promise<string>}
      * @private
      */
     _retrieveData = async (key) => {
         const value = await AsyncStorage.getItem(key);
         if (value !== null) {
             return JSON.parse(value);
+        } else {
+            return value;
         }
     };
 
@@ -621,7 +633,7 @@ class WorkoutVoiceCounter extends React.Component {
                     this.cancelCount();
 
                     (async() => {
-                        await Analytics.logEvent('arrival_forced_termination');
+                        await Analytics.logEvent("arrival_forced_termination");
                     })();
                 }
             }
@@ -689,7 +701,7 @@ class WorkoutVoiceCounter extends React.Component {
                             });
 
                             (async() => {
-                                await Analytics.logEvent('arrival_finish');
+                                await Analytics.logEvent("arrival_finish");
                             })();
                         } else if (this.state.nowSetCount < settingSet) {
                             if (this.state.settingIntervalMinutes === 0 && this.state.settingIntervalSeconds === 0) {
@@ -715,7 +727,7 @@ class WorkoutVoiceCounter extends React.Component {
                     this.cancelCount();
 
                     (async() => {
-                        await Analytics.logEvent('arrival_forced_termination');
+                        await Analytics.logEvent("arrival_forced_termination");
                     })();
                 }
             }
@@ -732,7 +744,7 @@ class WorkoutVoiceCounter extends React.Component {
                 primaryButtonLabel: "再開"
             });
             (async() => {
-                await Analytics.logEvent('click_pause', {
+                await Analytics.logEvent("click_pause", {
                     nowStatus: this.state.nowStatus
                 });
             })();
@@ -743,7 +755,7 @@ class WorkoutVoiceCounter extends React.Component {
             });
             autoCancelCount = 0;
             (async() => {
-                await Analytics.logEvent('click_restart', {
+                await Analytics.logEvent("click_restart", {
                     nowStatus: this.state.nowStatus
                 });
             })();
@@ -857,14 +869,14 @@ class WorkoutVoiceCounter extends React.Component {
                     this.cancelCount();
 
                     (async() => {
-                        await Analytics.logEvent('arrival_forced_termination');
+                        await Analytics.logEvent("arrival_forced_termination");
                     })();
                 }
             }
         }, 1000);
 
         (async() => {
-            await Analytics.logEvent('arrival_interval');
+            await Analytics.logEvent("arrival_interval");
         })();
     }
 
@@ -885,7 +897,7 @@ class WorkoutVoiceCounter extends React.Component {
                 Bugsnag.notify("Error _storeData");
             });
             (async() => {
-                await Analytics.logEvent('click_start');
+                await Analytics.logEvent("click_start");
             })();
         } else {
             this._pauseCount();
@@ -896,11 +908,11 @@ class WorkoutVoiceCounter extends React.Component {
         this.cancelCount();
         if (this.state.isCountEnd) {
             (async() => {
-                await Analytics.logEvent('click_home');
+                await Analytics.logEvent("click_home");
             })();
         } else {
             (async() => {
-                await Analytics.logEvent('click_cancel', {
+                await Analytics.logEvent("click_cancel", {
                     nowStatus: this.state.nowStatus
                 });
             })();
