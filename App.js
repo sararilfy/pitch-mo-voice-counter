@@ -999,15 +999,15 @@ const styles = StyleSheet.create({
         borderRadius: 150,
         paddingTop: 20,
         paddingBottom: 20,
-        width: 136
+        width: 130
     },
     buttonDisabled: {
         opacity: .5
     },
     buttonPosition: {
-        bottom: 70,
+        bottom: 50,
         position: "absolute",
-        width: 136
+        width: 130
     },
     buttonPrimary: {
         right: "8%"
@@ -1060,7 +1060,7 @@ const styles = StyleSheet.create({
         left: 0,
         position: "absolute",
         right: 0,
-        top: 158,
+        top: 118,
         width: "100%"
     },
     circleSvg: {
@@ -1070,7 +1070,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         left: 0,
         right: 0,
-        top: 80,
+        top: 40,
         alignItems: "center",
         width: "100%"
     },
@@ -1086,7 +1086,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         height: 245,
         left: 0,
-        top: 175,
+        top: 135,
         position: "absolute",
         width: "100%"
     },
