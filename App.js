@@ -693,7 +693,7 @@ class WorkoutVoiceCounter extends React.Component {
                             label = "終了";
                             this._playSound(false, "end");
                             this.setState({
-                                secondaryButtonLabel: "ホームへ",
+                                secondaryButtonLabel: "設定へ",
                                 primaryButtonIsDisabled: true,
                                 nowPitchSecondCount: label,
                                 isCountEnd: true,
