@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "workoutVoiceCounter",
-    "slug": "workoutVoiceCounter",
+    "name": "ピッチモボイス",
+    "description": "「いち、に、いっかい(1回)、いち、に、にかい(2回)…」のように回数だけでなく、1回の間隔の秒カウントも、女の子の声でカウントするアプリです。",
+    "slug": "PitchMoVoiceCounter",
+    "sdkVersion": "38.0.0",
     "platforms": [
-      "ios",
-      "android",
-      "web"
+      "ios"
     ],
+    "githubUrl": "https://github.com/sararilfy/workout-voice-counter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,9 +23,10 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "info.saralab.pitchMoVoiceCounter",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "buildNumber": "1.0.0"
     },
     "extra": {
       "bugsnag": {
