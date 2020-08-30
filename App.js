@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { Appearance, AppearanceProvider } from "react-native-appearance";
 import * as FirebaseCore from "expo-firebase-core";
 import * as Analytics from "expo-firebase-analytics";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 
 const
     CIRCLE_STROKE_SIZE_MAX = 813,
@@ -592,6 +593,17 @@ class WorkoutVoiceCounter extends React.Component {
     }
 
     /**
+     * Function keeping screen awake
+     */
+    _keepAwakeActivate = () => {
+        activateKeepAwake();
+    };
+
+    _keepAwakeDeactivate = () => {
+        deactivateKeepAwake();
+    };
+
+    /**
      * Function prepare count
      */
     _prepareCount = () => {
@@ -601,6 +613,7 @@ class WorkoutVoiceCounter extends React.Component {
             primaryButtonLabel: "一時停止",
             secondaryButtonIsDisabled: false
         });
+        this._keepAwakeActivate();
         let time = COUNT_NUM_PREPARE,
             label = "";
         this._playSound(true, COUNT_NUM_PREPARE);
@@ -789,6 +802,7 @@ class WorkoutVoiceCounter extends React.Component {
             isCountEnd: false,
             isIntervalEnd: false
         });
+        this._keepAwakeDeactivate();
 
         if (colorChangeFlg) {
             this._setModeColor(colorSchemeName);
