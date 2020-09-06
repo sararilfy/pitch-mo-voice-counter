@@ -49,7 +49,7 @@ let
     colorSchemeName = Appearance.getColorScheme(),
     colorChangeFlg = false;
 
-if (colorSchemeName !== "light" || colorSchemeName !== "dark") {
+if (colorSchemeName !== "light" && colorSchemeName !== "dark") {
     colorSchemeName = "light"
 }
 
