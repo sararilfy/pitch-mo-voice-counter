@@ -511,6 +511,7 @@ class WorkoutVoiceCounter extends React.Component {
      * @private
      */
     _playSound = (isNum, label) => {
+        pauseFlg = true;
         this._loadSound(isNum, label).then(() => {
             this.playbackInstance.playAsync().catch(() => {
                 if (isNum && !soundErrorNumFlg) {
@@ -521,6 +522,9 @@ class WorkoutVoiceCounter extends React.Component {
                     Bugsnag.notify(label);
                 }
             });
+        }).then(()=> {
+            pauseFlg = false;
+            autoCancelCount = 0;
         });
     }
 
